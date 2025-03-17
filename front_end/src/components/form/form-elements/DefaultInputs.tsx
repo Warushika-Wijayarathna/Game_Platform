@@ -7,6 +7,9 @@ import TextArea from "../input/TextArea.tsx";
 import DropzoneComponent from "./DropZone.tsx";
 import Button from "../../ui/button/Button.tsx";
 import DropzoneAnyComponent from "./DropZone-Any.tsx";
+import { saveGame } from "../../api/games";
+import { storage } from "../../config/firebase-config";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export default function GameForm() {
   const [gameData, setGameData] = useState({
@@ -35,10 +38,28 @@ export default function GameForm() {
     setGameData((prev) => ({ ...prev, category: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleFileUpload = async (file: File, path: string) => {
+    const storageRef = ref(storage, path);
+    await uploadBytes(storageRef, file);
+    return await getDownloadURL(storageRef);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Game Data:", gameData);
-    // Here, you can send the gameData to your backend API
+    try {
+      if (gameData.image) {
+        const imageUrl = await handleFileUpload(gameData.image, `images/${gameData.image.name}`);
+        gameData.image = imageUrl;
+      }
+      if (gameData.filepath) {
+        const fileUrl = await handleFileUpload(gameData.filepath, `files/${gameData.filepath.name}`);
+        gameData.filepath = fileUrl;
+      }
+      const savedGame = await saveGame(gameData);
+      console.log("Game saved successfully:", savedGame);
+    } catch (error) {
+      console.error("Error saving game:", error);
+    }
   };
 
   return (
