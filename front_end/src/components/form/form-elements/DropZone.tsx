@@ -2,14 +2,16 @@ import ComponentCard from "../../common/ComponentCard";
 import { useDropzone } from "react-dropzone";
 // import Dropzone from "react-dropzone";
 
-const DropzoneComponent: React.FC = () => {
-  const onDrop = (acceptedFiles: File[]) => {
-    console.log("Files dropped:", acceptedFiles);
-    // Handle file uploads here
-  };
+interface DropzoneComponentProps {
+  onDrop: (file: File[]) => void;
+}
 
+const DropzoneComponent: React.FC<DropzoneComponentProps> = ({ onDrop }) => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
+    onDrop: (acceptedFiles) => {
+      console.log("Files dropped:", acceptedFiles);
+      onDrop(acceptedFiles); // Pass files to parent component
+    },
     accept: {
       "image/png": [],
       "image/jpeg": [],
@@ -17,6 +19,7 @@ const DropzoneComponent: React.FC = () => {
       "image/svg+xml": [],
     },
   });
+
   return (
     <ComponentCard title="Dropzone">
       <div className="transition border border-gray-300 border-dashed cursor-pointer dark:hover:border-brand-500 dark:border-gray-700 rounded-xl hover:border-brand-500">

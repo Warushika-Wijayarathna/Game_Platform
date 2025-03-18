@@ -3,12 +3,12 @@ import ComponentCard from "../../common/ComponentCard";
 import Label from "../Label";
 import Input from "../input/InputField";
 import Select from "../Select";
-import TextArea from "../input/TextArea.tsx";
-import DropzoneComponent from "./DropZone.tsx";
-import Button from "../../ui/button/Button.tsx";
-import DropzoneAnyComponent from "./DropZone-Any.tsx";
-import { saveGame } from "../../api/games";
-import { storage } from "../../config/firebase-config";
+import TextArea from "../input/TextArea";
+import DropzoneComponent from "./DropZone";
+import Button from "../../ui/button/Button";
+import DropzoneAnyComponent from "./DropZone-Any";
+import { saveGame } from "../../../api/games";
+import { storage } from "../../../config/firebase-config";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export default function GameForm() {
@@ -18,8 +18,8 @@ export default function GameForm() {
     category: "",
     rules: "",
     price: "",
-    image: null,
-    filepath: "",
+    image: null as File | null,
+    filepath: null as File | null,
   });
 
   const categories = [
@@ -47,15 +47,16 @@ export default function GameForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (gameData.image) {
-        const imageUrl = await handleFileUpload(gameData.image, `images/${gameData.image.name}`);
-        gameData.image = imageUrl;
-      }
-      if (gameData.filepath) {
-        const fileUrl = await handleFileUpload(gameData.filepath, `files/${gameData.filepath.name}`);
-        gameData.filepath = fileUrl;
-      }
-      const savedGame = await saveGame(gameData);
+      const imageUrl = gameData.image ? await handleFileUpload(gameData.image, `images/${gameData.image.name}`) : "";
+      const fileUrl = gameData.filepath ? await handleFileUpload(gameData.filepath, `files/${gameData.filepath.name}`) : "";
+
+      const updatedGameData = {
+        ...gameData,
+        image: imageUrl,
+        filepath: fileUrl,
+      };
+
+      const savedGame = await saveGame(updatedGameData);
       console.log("Game saved successfully:", savedGame);
     } catch (error) {
       console.error("Error saving game:", error);
@@ -67,23 +68,28 @@ export default function GameForm() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <Label htmlFor="name">Game Name</Label>
-            <Input type="text" id="name" name="name" value={gameData.name} onChange={handleInputChange}/>
+            <Input type="text" id="name" name="name" value={gameData.name} onChange={handleInputChange} />
           </div>
 
-          <div>
-            <Label>Description</Label>
-            <TextArea rows={4} value={gameData.description} />
-          </div>
+          <TextArea
+              rows={4}
+              name="description"
+              value={gameData.description}
+              onChange={(value) => setGameData((prev) => ({ ...prev, description: value }))}
+          />
 
           <div>
             <Label>Category</Label>
-            <Select options={categories} placeholder="Select Category" onChange={handleSelectChange} />
+            <Select options={categories} value={gameData.category} placeholder="Select Category" onChange={handleSelectChange} />
           </div>
 
-          <div>
-            <Label>Rules</Label>
-            <TextArea rows={4} value={gameData.rules} />
-          </div>
+          <TextArea
+              rows={4}
+              name="rules"
+              value={gameData.rules}
+              onChange={(value) => setGameData((prev) => ({ ...prev, rules: value }))}
+          />
+
 
           <div>
             <Label>Price</Label>
@@ -92,12 +98,12 @@ export default function GameForm() {
 
           <div>
             <Label>Upload Image</Label>
-            <DropzoneComponent/>
+            <DropzoneComponent onDrop={(files) => setGameData((prev) => ({ ...prev, image: files[0] }))} />
           </div>
 
           <div>
             <Label>Assets</Label>
-            <DropzoneAnyComponent/>
+            <DropzoneAnyComponent onDrop={(files) => setGameData((prev) => ({ ...prev, filepath: files[0] }))} />
           </div>
 
           <div className="text-right">
