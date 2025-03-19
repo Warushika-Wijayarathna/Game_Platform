@@ -1,10 +1,16 @@
 package com.zenova.back_end.controller;
 
+import com.zenova.back_end.dto.GameDTO;
+import com.zenova.back_end.dto.ResponseDTO;
 import com.zenova.back_end.service.GameService;
 import com.zenova.back_end.util.JwtUtil;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.zenova.back_end.util.VarList;
+import io.jsonwebtoken.Claims;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/game")
@@ -17,7 +23,46 @@ public class GameController {
         this.jwtUtil = jwtUtil;
     }
 
-    @PostMapping(value = "/add")
-    // request body includes the user token check for priviledges before give access if only admin can add games
+    private boolean isAdmin(String token) {
+        Claims claims = jwtUtil.getUserRoleCodeFromToken(token);
+        return "ADMIN".equals(claims.get("role", String.class));
+    }
 
+    @PostMapping("/add")
+    public ResponseEntity<ResponseDTO> addGame(@RequestHeader("Authorization") String token, @RequestBody GameDTO gameDTO) {
+        if (!isAdmin(token)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ResponseDTO(VarList.Forbidden, "Access Denied", null));
+        }
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ResponseDTO(VarList.Created, "Game Added", gameService.addGame(gameDTO)));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<GameDTO>> getAllGames() {
+        return ResponseEntity.ok(gameService.getAllGames());
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<ResponseDTO> updateGame(@RequestHeader("Authorization") String token, @RequestBody GameDTO gameDTO) {
+        if (!isAdmin(token)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ResponseDTO(VarList.Forbidden, "Access Denied", null));
+        }
+        return ResponseEntity.ok(new ResponseDTO(VarList.OK, "Game Updated", gameService.updateGame(gameDTO)));
+    }
+
+    @PostMapping("/deactivate")
+    public ResponseEntity<ResponseDTO> deactivateGame(@RequestHeader("Authorization") String token, @RequestParam Long id) {
+        if (!isAdmin(token)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ResponseDTO(VarList.Forbidden, "Access Denied", null));
+        }
+        return ResponseEntity.ok(new ResponseDTO(VarList.OK, "Game Deactivated", gameService.deactivateGame(id)));
+    }
+
+    @GetMapping("/all-active")
+    public ResponseEntity<List<GameDTO>> getAllActiveGames() {
+        return ResponseEntity.ok(gameService.getAllActiveGames());
+    }
 }

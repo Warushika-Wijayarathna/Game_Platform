@@ -16,7 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -72,6 +74,32 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     }
 
     @Override
+    public List<UserDTO> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                    .map(user -> modelMapper.map(user, UserDTO.class))
+                    .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateUser(UserDTO userDTO) {
+        if (userRepository.existsByEmail(userDTO.getEmail())) {
+            User user = userRepository.findByEmail(userDTO.getEmail());
+            modelMapper.map(userDTO, user);
+            userRepository.save(user);
+        }
+    }
+
+    @Override
+    public void deactivateUser(UserDTO userDTO) {
+        if (userRepository.existsByEmail(userDTO.getEmail())) {
+            User user = userRepository.findByEmail(userDTO.getEmail());
+            user.setActive(false);
+            userRepository.save(user);
+        }
+    }
+
+    @Override
     public int saveUser(UserDTO userDTO) {
         if (userRepository.existsByEmail(userDTO.getEmail())) {
             return VarList.Not_Acceptable;
@@ -86,4 +114,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
             userRepository.save(modelMapper.map(userDTO, User.class));
             return VarList.Created;
         }
-    }}
+    }
+
+
+}

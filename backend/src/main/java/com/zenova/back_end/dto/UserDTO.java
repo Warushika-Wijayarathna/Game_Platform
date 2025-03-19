@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class UserDTO {
+    private Long id;
     @Email(message = "Email should be valid")
     private String email;
     private String password;
@@ -19,4 +20,8 @@ public class UserDTO {
     @Size(min = 3, max = 20, message = "Name should be between 3 and 20 characters")
     private String name;
     private String role;
+
+    public UserDTO(String userEmail) {
+        this.email = userEmail;
+    }
 }
