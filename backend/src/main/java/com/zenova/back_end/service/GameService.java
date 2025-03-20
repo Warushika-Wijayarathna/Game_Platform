@@ -14,4 +14,6 @@ public interface GameService {
     Object deactivateGame(Long id);
 
     List<GameDTO> getAllActiveGames();
+
+    Object purchaseGame(String token, Long id);
 }

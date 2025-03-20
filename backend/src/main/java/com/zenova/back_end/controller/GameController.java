@@ -65,4 +65,9 @@ public class GameController {
     public ResponseEntity<List<GameDTO>> getAllActiveGames() {
         return ResponseEntity.ok(gameService.getAllActiveGames());
     }
+
+    @PostMapping("/purchase")
+    public ResponseEntity<ResponseDTO> purchaseGame(@RequestHeader("Authorization") String token, @RequestParam Long id) {
+        return ResponseEntity.ok(new ResponseDTO(VarList.OK, "Game Purchased", gameService.purchaseGame(token, id)));
+    }
 }

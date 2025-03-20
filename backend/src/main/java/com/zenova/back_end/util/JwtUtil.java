@@ -7,7 +7,6 @@ package com.zenova.back_end.util;
             import io.jsonwebtoken.SignatureAlgorithm;
             import jakarta.validation.Valid;
             import org.springframework.beans.factory.annotation.Autowired;
-            import org.springframework.beans.factory.annotation.Value;
             import org.springframework.context.annotation.PropertySource;
             import org.springframework.security.core.userdetails.UserDetails;
             import org.springframework.stereotype.Component;

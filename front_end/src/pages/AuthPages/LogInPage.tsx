@@ -14,9 +14,7 @@ const LoginForm: React.FC = () => {
         event.preventDefault();
         setError(null);
         try {
-            await login(email, password, () => {
-                navigate("/gamingpage");
-            });
+            await login(email, password);
         } catch (err: unknown) {
             if (err instanceof Error) {
                 setError(err.message);

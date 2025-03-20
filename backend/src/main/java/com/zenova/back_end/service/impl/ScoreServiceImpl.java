@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
 public class ScoreServiceImpl implements ScoreService {
     @Autowired
     private ScoreRepository scoreRepository;
@@ -34,6 +33,7 @@ public class ScoreServiceImpl implements ScoreService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Transactional
     @Override
     public ScoreDTO addScore(ScoreDTO score) {
         Game game = gameRepository.getReferenceById(String.valueOf(score.getGame().getId()));
@@ -52,6 +52,6 @@ public class ScoreServiceImpl implements ScoreService {
 
     @Override
     public int getRank(ScoreDTO savedScore) {
-        return 0;
+        return leaderBoardRepository.getRank(savedScore.getGame().getId(), savedScore.getUser().getEmail());
     }
 }

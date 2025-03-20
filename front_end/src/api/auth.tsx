@@ -5,10 +5,10 @@ interface AuthResponse {
     token: string;
 }
 
-export const login = (email: string, password: string, onSuccess?: () => void): Promise<AuthResponse> => {
+export const login = (email: string, password: string): Promise<AuthResponse> => {
     return new Promise((resolve, reject) => {
         $.ajax({
-            url: 'http://localhost:8080/api/v1/user/login',
+            url: 'http://localhost:8080/api/v1/auth/authenticate',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ email, password }),
@@ -17,8 +17,10 @@ export const login = (email: string, password: string, onSuccess?: () => void): 
                 localStorage.setItem('token', response.token);
                 resolve(response);
 
-                if (onSuccess) {
-                    onSuccess();
+                if (email.endsWith('@zplay.com')) {
+                    window.location.href = '/admin-home';
+                } else {
+                    window.location.href = '/gamingpage';
                 }
             },
             error: (xhr, _status, error) => {
@@ -40,6 +42,12 @@ export const signup = (name: string, email: string, password: string): Promise<A
                 console.log('Signup response:', response);
                 localStorage.setItem('token', response.token);
                 resolve(response);
+
+                if (email.endsWith('@zplay.com')) {
+                    window.location.href = '/admin-home';
+                } else {
+                    window.location.href = '/gamingpage';
+                }
             },
             error: (xhr, _status, error) => {
                 console.error('Signup error:', xhr.responseText || error);

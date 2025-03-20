@@ -18,6 +18,7 @@ import { ScrollToTop } from "./components/common/ScrollToTop";
 import LoginForm from "./pages/AuthPages/LogInPage.tsx";
 import GamingPage from "./pages/GamingPage.tsx";
 import SignUpForm from "./pages/AuthPages/SignUpPage.tsx";
+import Home from "./pages/Dashboard/Home";
 
 export default function App() {
   return (
@@ -30,8 +31,10 @@ export default function App() {
           <Route path="/signup" element={<SignUpForm />} />
           <Route path="/gamingpage" element={<GamingPage />} />
 
+
           {/* Dashboard Layout */}
           <Route element={<AppLayout />}>
+            <Route path="/admin-home" element={<Home />} />
 
             {/* Others Page */}
             <Route path="/profile" element={<UserProfiles />} />

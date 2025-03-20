@@ -1,14 +1,22 @@
 package com.zenova.back_end.service.impl;
 
 import com.zenova.back_end.dto.GameDTO;
+import com.zenova.back_end.dto.PurchaseDTO;
 import com.zenova.back_end.entity.Game;
+import com.zenova.back_end.entity.Purchase;
+import com.zenova.back_end.entity.User;
 import com.zenova.back_end.repo.GameRepository;
+import com.zenova.back_end.repo.PurchaseRepository;
+import com.zenova.back_end.repo.UserRepository;
 import com.zenova.back_end.service.GameService;
 
+import com.zenova.back_end.util.JwtUtil;
+import io.jsonwebtoken.Claims;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,11 +26,22 @@ public class GameServiceImpl implements GameService {
     private final GameRepository gameRepository;
 
     @Autowired
+    private final PurchaseRepository purchaseRepository;
+
+    @Autowired
+    private final UserRepository userRepository;
+
+    @Autowired
     ModelMapper modelMapper;
 
-    public GameServiceImpl(GameRepository gameRepository) {
-        this.gameRepository = gameRepository;
+    @Autowired
+    private final JwtUtil jwtUtil;
 
+    public GameServiceImpl(GameRepository gameRepository, PurchaseRepository purchaseRepository, UserRepository userRepository, JwtUtil jwtUtil) {
+        this.gameRepository = gameRepository;
+        this.purchaseRepository = purchaseRepository;
+        this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
@@ -76,6 +95,24 @@ public class GameServiceImpl implements GameService {
         return games.stream()
                 .map(game -> modelMapper.map(game, GameDTO.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Object purchaseGame(String token, Long id) {
+        Claims claims = jwtUtil.getUserRoleCodeFromToken(token);
+        String email = claims.getSubject();
+        User user = userRepository.findByEmail(email);
+
+        Game game = gameRepository.findById(String.valueOf(id))
+                .orElseThrow(() -> new RuntimeException("Game not found or inactive"));
+
+        Purchase purchase = new Purchase();
+        purchase.setUser(user);
+        purchase.setGame(game);
+        purchase.setPurchaseDate(LocalDateTime.now());
+        purchaseRepository.save(purchase);
+
+        return modelMapper.map(purchase, PurchaseDTO.class);
     }
 
 }
