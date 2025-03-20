@@ -23,5 +23,6 @@ public class LeaderBoard {
     @JoinColumn(name = "score_id", nullable = false)
     private Score score;
 
+    @Column(name = "`rank`", nullable = false)
     private int rank;
 }
