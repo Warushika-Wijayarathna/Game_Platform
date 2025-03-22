@@ -1,106 +1,84 @@
 package com.zenova.back_end.util;
 
-            import com.zenova.back_end.dto.UserDTO;
-            import com.zenova.back_end.service.redis.RedisService;
-            import io.jsonwebtoken.Claims;
-            import io.jsonwebtoken.Jwts;
-            import io.jsonwebtoken.SignatureAlgorithm;
-            import jakarta.validation.Valid;
-            import org.springframework.beans.factory.annotation.Autowired;
-            import org.springframework.beans.factory.annotation.Value;
-            import org.springframework.context.annotation.PropertySource;
-            import org.springframework.security.core.userdetails.UserDetails;
-            import org.springframework.stereotype.Component;
+import com.zenova.back_end.dto.UserDTO;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
-            import java.io.Serializable;
-            import java.security.SecureRandom;
-            import java.util.Base64;
-            import java.util.Date;
-            import java.util.HashMap;
-            import java.util.Map;
-            import java.util.function.Function;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
-            @Component
-            @PropertySource(ignoreResourceNotFound = true, value = "classpath:otherprops.properties")
-            public class JwtUtil implements Serializable {
+@Component
+@PropertySource(ignoreResourceNotFound = true, value = "classpath:application.properties")
+public class JwtUtil implements Serializable {
 
-                private static final long serialVersionUID = 234234523523L;
+    private static final long serialVersionUID = 234234523523L;
+    public static final long JWT_TOKEN_VALIDITY = 24 * 60 * 60 * 12;
 
-                public static final long JWT_TOKEN_VALIDITY = 24 * 60 * 60 * 12;
+    @Value("${jwt.secret}")
+    private String secretKey;
 
-                @Autowired
-                private RedisService redisService;
+    public String getUsernameFromToken(String token) {
+        System.out.println("===================getUserNameFromToken===============================================");
+        System.out.println("Validating with Secret Key: " + secretKey); // Log the secret key
+        System.out.println("Token: " + token); // Log the token
+        return getClaimFromToken(token, Claims::getSubject);
+    }
 
-                private String generateSecretKey(String email) {
-                    byte[] key = new byte[64];
-                    new SecureRandom().nextBytes(key);
-                    String randomKey = Base64.getEncoder().encodeToString(key);
-                    String secretKey = Base64.getEncoder().encodeToString((email + randomKey).getBytes());
-                    redisService.storeSecretKey(email, secretKey);
-                    System.out.println("Secret Key: " + secretKey);
-                    return secretKey;
-                }
+    public Claims getUserRoleCodeFromToken(String token) {
+        System.out.println("===============================================================================");
+        System.out.println("Validating with Secret Key: " + secretKey); // Log the secret key
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+    }
 
-                //retrieve username from jwt token
-                public String getUsernameFromToken(String token) {
-                    return getClaimFromToken(token, Claims::getSubject);
-                }
+    public Date getExpirationDateFromToken(String token) {
+        return getClaimFromToken(token, Claims::getExpiration);
+    }
 
-                public Claims getUserRoleCodeFromToken(String token) {
-                    String email = getUsernameFromToken(token);
-                    String secretKey = redisService.getSecretKey(email);
-                    return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
-                }
+    public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = getAllClaimsFromToken(token);
+        System.out.println("====================getClaimFromToken==============================================");
+        System.out.println("Claims: " + claims); // Log the claims
+        return claimsResolver.apply(claims);
+    }
 
-                //retrieve expiration date from jwt token
-                public Date getExpirationDateFromToken(String token) {
-                    return getClaimFromToken(token, Claims::getExpiration);
-                }
+    public Claims getAllClaimsFromToken(String token) {
+        System.out.println("Validating with Secret Key: " + secretKey); // Log the secret key
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+    }
 
-                public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
-                    final Claims claims = getAllClaimsFromToken(token);
-                    return claimsResolver.apply(claims);
-                }
+    private Boolean isTokenExpired(String token) {
+        final Date expiration = getExpirationDateFromToken(token);
+        System.out.println("Token Expiration: " + expiration); // Logging
+        return expiration.before(new Date());
+    }
 
-                //for retrieving any information from token we will need the secret key
-                private Claims getAllClaimsFromToken(String token) {
-                    String email = getUsernameFromToken(token);
-                    String secretKey = redisService.getSecretKey(email);
-                    return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
-                }
+    public String generateToken(@Valid UserDTO userDTO) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", "ROLE_" + userDTO.getRole()); // Ensure ROLE_ prefix is added
+        System.out.println("Using Secret Key: " + secretKey); // Log the secret key
+        return doGenerateToken(claims, userDTO.getEmail());
+    }
 
-                //check if the token has expired
-                private Boolean isTokenExpired(String token) {
-                    final Date expiration = getExpirationDateFromToken(token);
-                    return expiration.before(new Date());
-                }
+    private String doGenerateToken(Map<String, Object> claims, String subject) {
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(subject)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+                .signWith(SignatureAlgorithm.HS512, secretKey).compact();
+    }
 
-                //generate token for user
-                public String generateToken(@Valid UserDTO userDTO) {
-                    Map<String, Object> claims = new HashMap<>();
-                    claims.put("role", userDTO.getRole());
-                    String secretKey = generateSecretKey(userDTO.getEmail());
-                    String token = doGenerateToken(claims, userDTO.getEmail(), secretKey);
-                    System.out.println("Secret key: " + secretKey);
-                    System.out.println("Token: " + token);
-                    return token;
-                }
-
-                //while creating the token -
-                //1. Define  claims of the token, like Issuer, Expiration, Subject, and the ID
-                //2. Sign the JWT using the HS512 algorithm and secret key.
-                private String doGenerateToken(Map<String, Object> claims, String subject, String secretKey) {
-                    return Jwts.builder()
-                            .setClaims(claims)
-                            .setSubject(subject)
-                            .setIssuedAt(new Date(System.currentTimeMillis()))
-                            .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
-                            .signWith(SignatureAlgorithm.HS512, secretKey).compact();
-                }
-
-                //validate token
-                public Boolean validateToken(String token, UserDetails userDetails) {
-                    final String username = getUsernameFromToken(token);
-                    return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
-                }
-            }
+    public Boolean validateToken(String token, UserDetails userDetails) {
+        final String username = getUsernameFromToken(token);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+}

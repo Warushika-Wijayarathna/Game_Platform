@@ -1,8 +1,12 @@
 import $ from 'jquery';
 
 interface AuthResponse {
+    code: bigint;
     message: string;
-    token: string;
+    data: {
+        email: string;
+        token: string;
+    }
 }
 
 export const login = (email: string, password: string): Promise<AuthResponse> => {
@@ -14,7 +18,12 @@ export const login = (email: string, password: string): Promise<AuthResponse> =>
             data: JSON.stringify({ email, password }),
             success: (response: AuthResponse) => {
                 console.log('Login response:', response);
-                localStorage.setItem('token', response.token);
+                const existingToken = localStorage.getItem('token');
+                if (existingToken) {
+                    localStorage.setItem('token', response.data.token);
+                } else {
+                    localStorage.setItem('token', response.data.token);
+                }
                 resolve(response);
 
                 if (email.endsWith('@zplay.com')) {
@@ -22,6 +31,7 @@ export const login = (email: string, password: string): Promise<AuthResponse> =>
                 } else {
                     window.location.href = '/gamingpage';
                 }
+
             },
             error: (xhr, _status, error) => {
                 console.error('Login error:', xhr.responseText || error);
@@ -40,7 +50,7 @@ export const signup = (name: string, email: string, password: string): Promise<A
             data: JSON.stringify({ name, email, password }),
             success: (response: AuthResponse) => {
                 console.log('Signup response:', response);
-                localStorage.setItem('token', response.token);
+                localStorage.setItem('token', response.data.token);
                 resolve(response);
 
                 if (email.endsWith('@zplay.com')) {

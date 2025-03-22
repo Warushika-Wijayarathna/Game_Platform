@@ -1,23 +1,22 @@
 import React from "react";
 
 interface TextareaProps {
-    placeholder?: string,
-    rows?: number,
-    value: string,
-    onChange: (value: string) => void,
-    className?: string,
-    disabled?: boolean,
-    error?: boolean,
-    hint?: string,
-    name?: string
+    placeholder?: string;
+    rows?: number;
+    value: string;
+    className?: string;
+    disabled?: boolean;
+    error?: boolean;
+    hint?: string;
+    name?: string;
+    onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void; // Updated type
 }
-
 
 const TextArea: React.FC<TextareaProps> = ({
                                                placeholder = "Enter your message",
                                                rows = 3,
                                                value = "",
-                                               onChange,
+                                               onChange = () => {}, // Default to an empty function
                                                className = "",
                                                disabled = false,
                                                error = false,
@@ -26,7 +25,7 @@ const TextArea: React.FC<TextareaProps> = ({
                                            }) => {
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         if (onChange) {
-            onChange(e.target.value);
+            onChange(e); // Pass the event object
         }
     };
 
@@ -42,15 +41,15 @@ const TextArea: React.FC<TextareaProps> = ({
 
     return (
         <div className="relative">
-      <textarea
-          placeholder={placeholder}
-          rows={rows}
-          value={value}
-          onChange={handleChange}
-          disabled={disabled}
-          className={textareaClasses}
-            name={name}
-      />
+            <textarea
+                placeholder={placeholder}
+                rows={rows}
+                value={value}
+                onChange={handleChange}
+                disabled={disabled}
+                className={textareaClasses}
+                name={name}
+            />
             {hint && (
                 <p
                     className={`mt-2 text-sm ${
