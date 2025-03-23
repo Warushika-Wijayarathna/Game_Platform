@@ -15,6 +15,7 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useTheme } from "../../../context/ThemeContext.tsx";
 import { saveCategory, loadAllCategories } from "../../../api/category.tsx";
 import Form from "../Form.tsx";
+import Checkbox from "../input/Checkbox"; // Assuming you have a Checkbox component
 
 export default function GameForm() {
   const { theme } = useTheme();
@@ -26,6 +27,8 @@ export default function GameForm() {
     price: "",
     image: null as File | null,
     filepath: null as File | null,
+    active: true, // Default to true
+    uploadedBy: "user123", // Replace with actual logged-in user ID
   });
 
   const [showModal, setShowModal] = useState(false);
@@ -60,6 +63,10 @@ export default function GameForm() {
 
   const handleSelectChange = (value: string) => {
     setGameData((prev) => ({ ...prev, category: value }));
+  };
+
+  const handleCheckboxChange = (checked: boolean) => {
+    setGameData((prev) => ({ ...prev, active: checked }));
   };
 
   const handleFileUpload = async (file: File, path: string) => {
@@ -112,58 +119,121 @@ export default function GameForm() {
 
   return (
       <ComponentCard title="Add New Game">
-        <Form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <Label htmlFor="name">Game Name</Label>
-            <Input type="text" id="name" name="name" value={gameData.name} onChange={handleInputChange} />
-          </div>
+        {/* Increase the width of the form container */}
+        <div className="max-w-4xl mx-auto"> {/* Adjust max-w-4xl to your desired width */}
+          <Form onSubmit={handleSubmit} className="space-y-6">
+            {/* Use a grid container to create two columns */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Column 1 */}
+              <div className="space-y-6">
+                <div>
+                  <Label htmlFor="name">Game Name</Label>
+                  <Input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={gameData.name}
+                      onChange={handleInputChange}
+                      placeholder="Enter game name"
+                  />
+                </div>
 
-          <TextArea
-              rows={4}
-              name="description"
-              value={gameData.description}
-              onChange={handleInputChange}
-          />
+                <div>
+                  <Label htmlFor="description">Description</Label>
+                  <TextArea
+                      rows={4}
+                      name="description"
+                      value={gameData.description}
+                      onChange={handleInputChange}
+                      placeholder="Enter game description"
+                  />
+                </div>
 
-          <div>
-            <div className="flex items-center justify-between space-x-2 pb-4">
-              <Label>Category</Label>
-              <Button size="sm" variant="outline" className="p-2 flex items-center" onClick={() => setShowModal(true)}>
-                <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
+                <div>
+                  <div className="flex items-center justify-between space-x-2 pb-4">
+                    <Label>Category</Label>
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        className="p-2 flex items-center"
+                        onClick={() => setShowModal(true)}
+                    >
+                      <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <Select
+                      options={categories}
+                      value={gameData.category}
+                      placeholder="Select Category"
+                      onChange={handleSelectChange}
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="rules">Rules</Label>
+                  <TextArea
+                      rows={4}
+                      name="rules"
+                      value={gameData.rules}
+                      onChange={handleInputChange}
+                      placeholder="Enter game rules"
+                  />
+                </div>
+              </div>
+
+              {/* Column 2 */}
+              <div className="space-y-6">
+                <div>
+                  <Label htmlFor="price">Price</Label>
+                  <Input
+                      type="text"
+                      id="price"
+                      name="price"
+                      value={gameData.price}
+                      onChange={handleInputChange}
+                      placeholder="Enter game price"
+                  />
+                </div>
+
+                <div>
+                  <Label>Upload Image</Label>
+                  <DropzoneComponent
+                      onDrop={(files) =>
+                          setGameData((prev) => ({ ...prev, image: files[0] }))
+                      }
+                  />
+                </div>
+
+                <div>
+                  <Label>Assets</Label>
+                  <DropzoneAnyComponent
+                      onDrop={(files) =>
+                          setGameData((prev) => ({ ...prev, filepath: files[0] }))
+                      }
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="active">Active</Label>
+                  <Checkbox
+                      id="active"
+                      checked={gameData.active}
+                      onChange={handleCheckboxChange} // Pass the function directly
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Save Button */}
+            <div className="text-right">
+              <Button size="sm" variant="primary">
+                Save Game
               </Button>
             </div>
-            <Select options={categories} value={gameData.category} placeholder="Select Category" onChange={handleSelectChange} />
-          </div>
+          </Form>
+        </div>
 
-          <TextArea
-              rows={4}
-              name="rules"
-              value={gameData.rules}
-              onChange={handleInputChange}
-          />
-
-          <div>
-            <Label htmlFor="price">Price</Label>
-            <Input type="text" id="price" name="price" value={gameData.price} onChange={handleInputChange} />
-          </div>
-
-          <div>
-            <Label>Upload Image</Label>
-            <DropzoneComponent onDrop={(files) => setGameData((prev) => ({ ...prev, image: files[0] }))} />
-          </div>
-
-          <div>
-            <Label>Assets</Label>
-            <DropzoneAnyComponent onDrop={(files) => setGameData((prev) => ({ ...prev, filepath: files[0] }))} />
-          </div>
-
-          <div className="text-right">
-            <Button size="sm" variant="primary">
-              Save Game
-            </Button>
-          </div>
-        </Form>
-
+        {/* Modal for adding a new category */}
         {showModal && (
             <div
                 className="fixed inset-0 flex items-center justify-center z-50"
