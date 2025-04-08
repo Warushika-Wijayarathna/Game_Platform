@@ -8,12 +8,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class UserDTO {
-    private Long id;
+    private UUID uid;
     @Email(message = "Email should be valid")
     private String email;
     private String password;

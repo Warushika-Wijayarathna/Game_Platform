@@ -2,9 +2,11 @@ package com.zenova.back_end.service.impl;
 
 import com.zenova.back_end.dto.GameDTO;
 import com.zenova.back_end.dto.PurchaseDTO;
+import com.zenova.back_end.entity.Category;
 import com.zenova.back_end.entity.Game;
 import com.zenova.back_end.entity.Purchase;
 import com.zenova.back_end.entity.User;
+import com.zenova.back_end.repo.CategoryRepository;
 import com.zenova.back_end.repo.GameRepository;
 import com.zenova.back_end.repo.PurchaseRepository;
 import com.zenova.back_end.repo.UserRepository;
@@ -34,15 +36,19 @@ public class GameServiceImpl implements GameService {
     private final UserRepository userRepository;
 
     @Autowired
+    private final CategoryRepository categoryRepository;
+
+    @Autowired
     ModelMapper modelMapper;
 
     @Autowired
     private final JwtUtil jwtUtil;
 
-    public GameServiceImpl(GameRepository gameRepository, PurchaseRepository purchaseRepository, UserRepository userRepository, JwtUtil jwtUtil) {
+    public GameServiceImpl(GameRepository gameRepository, PurchaseRepository purchaseRepository, UserRepository userRepository, CategoryRepository categoryRepository, JwtUtil jwtUtil) {
         this.gameRepository = gameRepository;
         this.purchaseRepository = purchaseRepository;
         this.userRepository = userRepository;
+        this.categoryRepository = categoryRepository;
         this.jwtUtil = jwtUtil;
     }
 
@@ -50,6 +56,11 @@ public class GameServiceImpl implements GameService {
     @Override
     public GameDTO addGame(GameDTO gameDTO) {
         Game game = modelMapper.map(gameDTO, Game.class);
+        Category category = game.getCategory();
+        if (category != null && category.getId() == 0) {
+            category = categoryRepository.save(category);
+            game.setCategory(category);
+        }
         game = gameRepository.save(game);
         if(gameDTO.getUploadedBy().getRole()== Role.USER){
             User user = userRepository.findByUid(gameDTO.getUploadedBy().getUid());
@@ -93,7 +104,11 @@ public class GameServiceImpl implements GameService {
         Game game = gameRepository.findById(String.valueOf(id))
                 .orElseThrow(() -> new RuntimeException("Game not found"));
         game.setActive(false);
-        game = gameRepository.save(game);
+        System.out.println("Game deactivated attribute: " + game.isActive());
+        gameRepository.save(game);
+        System.out.println("Game deactivated: " + game.isActive());
+        GameDTO gameDTO = modelMapper.map(game, GameDTO.class);
+        System.out.println("Game deactivated DTO: " + gameDTO);
         return modelMapper.map(game, GameDTO.class);
     }
 

@@ -1,5 +1,5 @@
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
-import DefaultInputs from "../../components/form/form-elements/DefaultInputs";
+import DefaultInputs from "../../components/form/form-elements/GameForm.tsx";
 import PageMeta from "../../components/common/PageMeta";
 
 
@@ -11,9 +11,7 @@ export default function FormElements() {
                 description="This is React.js Form Elements  Dashboard page for TailAdmin - React.js Tailwind CSS Admin Dashboard Template"
             />
             <PageBreadcrumb pageTitle="From Elements" />
-                <div className="space-y-6">
-                    <DefaultInputs />
-                </div>
+            <DefaultInputs />
         </div>
     );
 }

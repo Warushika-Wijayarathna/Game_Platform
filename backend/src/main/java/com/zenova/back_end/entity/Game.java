@@ -29,9 +29,10 @@ package com.zenova.back_end.entity;
         private String rules;
         private String price;
         private String image;
-        private String filepath;
+        private String githubRepo;
         private boolean active;
         @ManyToOne
         @JoinColumn(name = "uploaded_by_uid")
         private User uploadedBy;
+        private String deployedLink;
     }

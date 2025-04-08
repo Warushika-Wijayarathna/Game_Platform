@@ -19,6 +19,9 @@ import LoginForm from "./pages/AuthPages/LogInPage.tsx";
 import GamingPage from "./pages/GamingPage.tsx";
 import SignUpForm from "./pages/AuthPages/SignUpPage.tsx";
 import Home from "./pages/Dashboard/Home";
+import CategoryForm from "./components/form/form-elements/CategoryForm.tsx";
+import GameForm from "./components/form/form-elements/GameForm.tsx";
+import UserForm from "./components/form/form-elements/UserForm.tsx";
 
 export default function App() {
   return (
@@ -43,6 +46,8 @@ export default function App() {
 
             {/* Forms */}
             <Route path="/form-elements" element={<FormElements />} />
+            <Route path="/form-elements/category" element={<CategoryForm />} />
+            <Route path="/form-elements/user" element={<UserForm />} />
 
             {/* Tables */}
             <Route path="/basic-tables" element={<BasicTables />} />

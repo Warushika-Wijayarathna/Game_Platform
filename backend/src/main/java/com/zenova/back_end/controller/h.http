@@ -1,0 +1,7 @@
+# curl "https://api.cloudflare.com/client/v4/user/tokens/verify"
+#--header "Authorization: Bearer <API_TOKEN>"
+GET https://api.cloudflare.com/client/v4/user/tokens/verify
+Authorization: Bearer nD8R43OWUowZnnJzTM5jNyErugfe7z3a_XP3yKoi
+
+###
+

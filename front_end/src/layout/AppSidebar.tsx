@@ -31,6 +31,16 @@ const navItems: NavItem[] = [
     path: "/form-elements",
   },
   {
+    name: "Category",
+    icon: <ListIcon />,
+    path: "/form-elements/category",
+  },
+  {
+    name: "User",
+    icon: <ListIcon />,
+    path: "/form-elements/user",
+  },
+  {
     icon: <CalenderIcon />,
     name: "Calendar",
     path: "/calendar",

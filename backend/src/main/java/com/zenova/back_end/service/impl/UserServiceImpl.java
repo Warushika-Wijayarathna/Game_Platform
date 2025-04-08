@@ -109,6 +109,17 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     }
 
     @Override
+    public UserDTO getUserByEmail(String email) {
+        if (userRepository.existsByEmail(email)) {
+            User user = userRepository.findByEmail(email);
+            System.out.println("User: " + user);
+            return modelMapper.map(user, UserDTO.class);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
     public int saveUser(UserDTO userDTO) {
         if (userRepository.existsByEmail(userDTO.getEmail())) {
             return VarList.Not_Acceptable;

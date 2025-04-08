@@ -1,34 +1,44 @@
-import {useState} from "react";
+import {useState, useEffect} from "react";
 
-interface Option {
+interface BaseOption {
     value: string;
     label: string;
 }
 
-interface SelectProps {
-    options: Option[],
+interface SelectProps<T extends BaseOption> {
+    options: T[],
     placeholder?: string,
-    onChange: (value: string) => void,
+    onChange: (selectedOption: T | null) => void,
     className?: string,
-    defaultValue?: string,
-    value?: string
+    defaultValue?: T | null,
+    value?: T | null,
+    required?: boolean,
+    id?: string
 }
 
-const Select: React.FC<SelectProps> = ({
-                                           options,
-                                           placeholder = "Select an option",
-                                           onChange,
-                                           className = "",
-                                           defaultValue = "",
-                                           value = ""
-                                       }) => {
-    // Manage the selected value
-    const [selectedValue, setSelectedValue] = useState<string>(defaultValue);
+const Select = <T extends BaseOption>({
+                                          options,
+                                          placeholder = "Select an option",
+                                          onChange,
+                                          className = "",
+                                          defaultValue = null,
+                                          value = null,
+                                          required = false,
+                                          id = "",
+                                      }: SelectProps<T>) => {
+    const [selectedValue, setSelectedValue] = useState<T | null>(defaultValue);
+
+    useEffect(() => {
+        if (value !== undefined) {
+            setSelectedValue(value);
+        }
+    }, [value]);
 
     const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const value = e.target.value;
-        setSelectedValue(value);
-        onChange(value); // Trigger parent handler
+        const selectedValue = e.target.value;
+        const selectedOption = options.find((option) => option.value === selectedValue) || null;
+        setSelectedValue(selectedOption);
+        onChange(selectedOption);
     };
 
     return (
@@ -38,18 +48,14 @@ const Select: React.FC<SelectProps> = ({
                     ? "text-gray-800 dark:text-white/90"
                     : "text-gray-400 dark:text-gray-400"
             } ${className}`}
-            value={selectedValue}
+            value={selectedValue ? selectedValue.value : ""}
             onChange={handleChange}
+            required={required}
+            id={id}
         >
-            {/* Placeholder option */}
-            <option
-                value=""
-                disabled
-                className="text-gray-700 dark:bg-gray-900 dark:text-gray-400"
-            >
+            <option value="" disabled className="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
                 {placeholder}
             </option>
-            {/* Map over options */}
             {options.map((option) => (
                 <option
                     key={option.value}
@@ -57,6 +63,7 @@ const Select: React.FC<SelectProps> = ({
                     className="text-gray-700 dark:bg-gray-900 dark:text-gray-400"
                 >
                     {option.label}
+
                 </option>
             ))}
         </select>

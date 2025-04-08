@@ -31,11 +31,13 @@ public class GameDTO {
     private String image;
 
     @Pattern(regexp = "^[a-zA-Z0-9/._-]*$", message = "File path should be a valid path")
-    private String filepath;
+    private String gitHubRepo;
 
     private boolean active;
 
     private User uploadedBy;
+
+    private String deployedLink;
 
     public GameDTO(Long gameId) {
         this.id = gameId;

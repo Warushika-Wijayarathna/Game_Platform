@@ -6,6 +6,7 @@ import com.zenova.back_end.service.GameService;
 import com.zenova.back_end.util.JwtUtil;
 import com.zenova.back_end.util.VarList;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,7 +26,12 @@ public class GameController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ResponseDTO> addGame(@RequestHeader("Authorization") String token, @RequestBody GameDTO gameDTO) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ResponseDTO> addGame(HttpServletRequest request, @RequestBody GameDTO gameDTO) {
+        // show received data
+        System.out.println("=============================================");
+        System.out.println("Received data: " + gameDTO);
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ResponseDTO(VarList.Created, "Game Added", gameService.addGame(gameDTO)));
     }
@@ -38,12 +44,17 @@ public class GameController {
     @PutMapping("/update")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseDTO> updateGame(@RequestHeader("Authorization") String token, @RequestBody GameDTO gameDTO) {
+        System.out.println("=============================================Update=======================");
+        System.out.println("Received data: " + gameDTO);
         return ResponseEntity.ok(new ResponseDTO(VarList.OK, "Game Updated", gameService.updateGame(gameDTO)));
     }
 
     @PostMapping("/deactivate")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseDTO> deactivateGame(@RequestHeader("Authorization") String token, @RequestParam Long id) {
+        System.out.println("=============================================Deactivate=======================");
+        System.out.println("Received data: " + id);
+        Object gameDTO = gameService.deactivateGame(id);
         return ResponseEntity.ok(new ResponseDTO(VarList.OK, "Game Deactivated", gameService.deactivateGame(id)));
     }
 

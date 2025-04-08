@@ -19,4 +19,6 @@ public interface UserService {
     void deactivateUser(UserDTO userDTO);
 
     List<UserDTO> getAllDevelopers();
+
+    UserDTO getUserByEmail(String email);
 }

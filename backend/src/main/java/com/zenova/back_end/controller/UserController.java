@@ -119,4 +119,26 @@ public class UserController {
         List<UserDTO> developers = userService.getAllDevelopers();
         return ResponseEntity.ok(developers);
     }
+
+    @GetMapping(value = "/me")
+    public ResponseEntity<?> getMe(@RequestHeader("Authorization") String authHeader) {
+        try {
+            // Remove the "Bearer " prefix from the token
+            String token = authHeader.replace("Bearer ", "");
+            System.out.println("Parsed Token: " + token); // Log the parsed token
+
+            Claims claims = jwtUtil.getAllClaimsFromToken(token);
+            String email = claims.getSubject(); // Use getSubject() instead of claims.get("email")
+            System.out.println("Email: " + email);
+
+            UserDTO userDTO = userService.getUserByEmail(email);
+            return ResponseEntity.ok(userDTO);
+        } catch (io.jsonwebtoken.io.DecodingException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseDTO(VarList.Bad_Request, "Invalid token format", null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDTO(VarList.Internal_Server_Error, e.getMessage(), null));
+        }
+    }
 }
