@@ -1,5 +1,6 @@
 package com.zenova.back_end.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.zenova.back_end.entity.Category;
 import com.zenova.back_end.entity.User;
 import lombok.AllArgsConstructor;
@@ -31,13 +32,13 @@ public class GameDTO {
     private String image;
 
     @Pattern(regexp = "^[a-zA-Z0-9/._-]*$", message = "File path should be a valid path")
-    private String gitHubRepo;
+    private String hostedUrl;
 
     private boolean active;
 
     private User uploadedBy;
-
-    private String deployedLink;
+    @JsonProperty("isApproved")
+    private Boolean isApproved;
 
     public GameDTO(Long gameId) {
         this.id = gameId;

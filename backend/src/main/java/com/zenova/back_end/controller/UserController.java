@@ -2,6 +2,7 @@ package com.zenova.back_end.controller;
 
 import com.zenova.back_end.util.Role;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import com.zenova.back_end.dto.AuthDTO;
 import com.zenova.back_end.dto.ResponseDTO;
@@ -9,12 +10,14 @@ import com.zenova.back_end.dto.UserDTO;
 import com.zenova.back_end.service.UserService;
 import com.zenova.back_end.util.JwtUtil;
 import com.zenova.back_end.util.VarList;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/v1/user")
@@ -93,29 +96,37 @@ public class UserController {
 //    }
 
     @GetMapping(value = "/getAll")
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
-
+    public ResponseEntity<ResponseDTO> getAllUsers() {
         List<UserDTO> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
+        return ResponseEntity.ok(new ResponseDTO(VarList.OK, "Success", users));
     }
 
     @PostMapping(value = "/update")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseDTO> updateUser(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<ResponseDTO> updateUser(HttpServletRequest request, @RequestBody UserDTO userDTO) {
         userService.updateUser(userDTO);
         return ResponseEntity.ok(new ResponseDTO(VarList.OK, "User Updated", null));
     }
 
     @PostMapping(value = "/deactivate")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseDTO> deactivateUser(@RequestBody UserDTO userDTO) {
-        userService.deactivateUser(userDTO);
+    public ResponseEntity<ResponseDTO> deactivateUser(HttpServletRequest request, @RequestBody UUID userId) {
+        System.out.println("Deactivating user with ID: " + userId);
+        userService.deactivateUser(userId);
         return ResponseEntity.ok(new ResponseDTO(VarList.OK, "User Deactivated", null));
+    }
+
+    @PostMapping(value = "/activate")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ResponseDTO> activateUser(HttpServletRequest request, @RequestBody UUID userId) {
+        System.out.println("Activating user with ID: " + userId);
+        userService.activateUser(userId);
+        return ResponseEntity.ok(new ResponseDTO(VarList.OK, "User Activated", null));
     }
 
     @GetMapping(value = "/all-developers")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<UserDTO>> getAllDevelopers() {
+    public ResponseEntity<List<UserDTO>> getAllDevelopers(HttpServletRequest request) {
         List<UserDTO> developers = userService.getAllDevelopers();
         return ResponseEntity.ok(developers);
     }

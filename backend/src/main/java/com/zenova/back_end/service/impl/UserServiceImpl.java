@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
@@ -92,11 +93,13 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     }
 
     @Override
-    public void deactivateUser(UserDTO userDTO) {
-        if (userRepository.existsByEmail(userDTO.getEmail())) {
-            User user = userRepository.findByEmail(userDTO.getEmail());
-            user.setActive(false);
-            userRepository.save(user);
+    public void deactivateUser(UUID userId) {
+        if (userRepository.existsById(userId)) {
+            User user = userRepository.findById(userId).orElse(null);
+            if (user != null) {
+                user.setActive(false);
+                userRepository.save(user);
+            }
         }
     }
 
@@ -116,6 +119,17 @@ public class UserServiceImpl implements UserDetailsService, UserService {
             return modelMapper.map(user, UserDTO.class);
         } else {
             return null;
+        }
+    }
+
+    @Override
+    public void activateUser(UUID userId) {
+        if (userRepository.existsById(userId)) {
+            User user = userRepository.findById(userId).orElse(null);
+            if (user != null) {
+                user.setActive(true);
+                userRepository.save(user);
+            }
         }
     }
 

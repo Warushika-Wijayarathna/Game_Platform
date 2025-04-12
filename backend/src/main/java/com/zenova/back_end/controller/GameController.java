@@ -38,7 +38,10 @@ public class GameController {
 
     @GetMapping("/all")
     public ResponseEntity<List<GameDTO>> getAllGames() {
-        return ResponseEntity.ok(gameService.getAllGames());
+        List<GameDTO> games = gameService.getAllGames();
+        System.out.println("=============================================");
+        System.out.println("Received data: " + games);
+        return ResponseEntity.ok(games);
     }
 
     @PutMapping("/update")

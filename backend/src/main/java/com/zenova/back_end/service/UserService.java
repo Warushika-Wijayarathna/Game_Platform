@@ -5,6 +5,7 @@ import com.zenova.back_end.dto.UserDTO;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface UserService {
     int saveUser(UserDTO userDTO);
@@ -16,9 +17,11 @@ public interface UserService {
 
     void updateUser(UserDTO userDTO);
 
-    void deactivateUser(UserDTO userDTO);
+    void deactivateUser(UUID userId);
 
     List<UserDTO> getAllDevelopers();
 
     UserDTO getUserByEmail(String email);
+
+    void activateUser(UUID userId);
 }

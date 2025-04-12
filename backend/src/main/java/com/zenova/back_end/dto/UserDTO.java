@@ -23,6 +23,7 @@ public class UserDTO {
     @Size(min = 3, max = 20, message = "Name should be between 3 and 20 characters")
     private String name;
     private Role role;
+    private boolean isActive;
 
     public UserDTO(String userEmail) {
         this.email = userEmail;

@@ -56,7 +56,8 @@ public class CategoryController {
         return ResponseEntity.ok(new ResponseDTO(VarList.OK, "Category Updated", categoryService.updateCategory(categoryDTO)));
     }
 
-    @PostMapping("deactivate/{id}")
+    @PutMapping("deactivate/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseDTO> deactivateCategory(HttpServletRequest request, @PathVariable Long id) {
         return ResponseEntity.ok(new ResponseDTO(VarList.OK, "Category Deactivated", categoryService.deactivateCategory(id)));
     }
