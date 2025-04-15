@@ -354,30 +354,18 @@ export default function PlayGame() {
                                 </div>
 
                                 {/* Streaming Video Container */}
-                                {(isStreaming || isWatching) && (
-                                    <div className="bg-gray-800 rounded-lg overflow-hidden mb-6">
-                                        <video
-                                            id="stream-video"
-                                            className="w-full aspect-video"
-                                            autoPlay
-                                            controls
-                                            muted={isStreaming}
-                                        />
-                                        {streamError && (
-                                            <div className="text-red-500 p-4">{streamError}</div>
-                                        )}
-                                    </div>
-                                )}
-
-                                {/* Game Playground */}
                                 {!isStreaming && !isWatching && (
                                     <div className="bg-gray-800 rounded-lg overflow-hidden">
-                                        <div className="aspect-video">
+                                        <div className="aspect-video relative">
                                             <PlayGround
                                                 key={sessionKey}
                                                 url={game.hostedUrl}
                                                 onFirstInteraction={() => setGameStarted(true)}
                                             />
+                                            {/* Add overlay to prevent interaction when streaming */}
+                                            {(isStreaming || isWatching) && (
+                                                <div className="absolute inset-0 bg-black/50 pointer-events-none" />
+                                            )}
                                         </div>
                                         <PlaygroundBottomAction
                                             gameStarted={gameStarted}
@@ -388,6 +376,21 @@ export default function PlayGame() {
                                             showDialog={exitDialogOpen}
                                             setShowDialog={setExitDialogOpen}
                                         />
+                                    </div>
+                                )}
+
+                                {(isStreaming || isWatching) && (
+                                    <div className="bg-gray-800 rounded-lg overflow-hidden mb-6">
+                                        <video
+                                            id="stream-video"
+                                            className="w-full aspect-video pointer-events-none" // Disable interactions
+                                            autoPlay
+                                            controls={false} // Remove video controls
+                                            muted={isStreaming}
+                                        />
+                                        {streamError && (
+                                            <div className="text-red-500 p-4">{streamError}</div>
+                                        )}
                                     </div>
                                 )}
                             </div>

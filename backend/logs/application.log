@@ -2965,3 +2965,49 @@ java.lang.IllegalArgumentException: Invalid character found in method name [0x16
 2025-04-15 14:54:07 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
 2025-04-15 14:54:07 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[LeaderBoardDTO(user=User(uid=6cca92da-6264-4037-b825-f542e09b1eb2, email=www.thilankathushani@gmail (truncated)...]
 2025-04-15 14:54:07 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2025-04-15 14:56:48 [http-nio-8080-exec-10] DEBUG o.s.security.web.FilterChainProxy - Securing GET /api/v1/leaderboard/top?gameId=14
+2025-04-15 14:56:48 [http-nio-8080-exec-10] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2025-04-15 14:56:48 [http-nio-8080-exec-10] DEBUG o.s.security.web.FilterChainProxy - Secured GET /api/v1/leaderboard/top?gameId=14
+2025-04-15 14:56:48 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/leaderboard/top?gameId=14", parameters={masked}
+2025-04-15 14:56:48 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.zenova.back_end.controller.LeaderBoardController#getTopLeaderBoard(String)
+2025-04-15 14:56:48 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+2025-04-15 14:56:48 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[LeaderBoardDTO(user=User(uid=6cca92da-6264-4037-b825-f542e09b1eb2, email=www.thilankathushani@gmail (truncated)...]
+2025-04-15 14:56:48 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2025-04-15 14:56:50 [http-nio-8080-exec-9] DEBUG o.s.security.web.FilterChainProxy - Securing GET /api/v1/leaderboard/top?gameId=14
+2025-04-15 14:56:50 [http-nio-8080-exec-9] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2025-04-15 14:56:50 [http-nio-8080-exec-9] DEBUG o.s.security.web.FilterChainProxy - Secured GET /api/v1/leaderboard/top?gameId=14
+2025-04-15 14:56:50 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/leaderboard/top?gameId=14", parameters={masked}
+2025-04-15 14:56:50 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.zenova.back_end.controller.LeaderBoardController#getTopLeaderBoard(String)
+2025-04-15 14:56:50 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+2025-04-15 14:56:50 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[LeaderBoardDTO(user=User(uid=6cca92da-6264-4037-b825-f542e09b1eb2, email=www.thilankathushani@gmail (truncated)...]
+2025-04-15 14:56:50 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2025-04-15 14:57:47 [http-nio-8080-exec-2] DEBUG o.s.security.web.FilterChainProxy - Securing POST /api/v1/play/game
+2025-04-15 14:57:47 [http-nio-8080-exec-2] DEBUG o.s.security.web.FilterChainProxy - Secured POST /api/v1/play/game
+2025-04-15 14:57:47 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/v1/play/game", parameters={}
+2025-04-15 14:57:47 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.zenova.back_end.controller.PlayController#playGame(String, PlayRequestDTO)
+2025-04-15 14:57:47 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [PlayRequestDTO(gameId=14, scoreValue=10)]
+2025-04-15 14:57:47 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+2025-04-15 14:57:47 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [PlayResponseDTO(message=Score recorded and leaderboard updated, newRank=0)]
+2025-04-15 14:57:47 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2025-04-15 14:57:47 [http-nio-8080-exec-4] DEBUG o.s.security.web.FilterChainProxy - Securing GET /api/v1/game/all
+2025-04-15 14:57:47 [http-nio-8080-exec-4] DEBUG o.s.security.web.FilterChainProxy - Secured GET /api/v1/game/all
+2025-04-15 14:57:47 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/game/all", parameters={}
+2025-04-15 14:57:47 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.zenova.back_end.controller.GameController#getAllGames()
+2025-04-15 14:57:47 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+2025-04-15 14:57:47 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[GameDTO(id=14, name=Fast Food Rush, description=You're at Burger King, sinking your teeth into a ju (truncated)...]
+2025-04-15 14:57:47 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2025-04-15 14:57:47 [http-nio-8080-exec-3] DEBUG o.s.security.web.FilterChainProxy - Securing GET /api/v1/game/all
+2025-04-15 14:57:47 [http-nio-8080-exec-3] DEBUG o.s.security.web.FilterChainProxy - Secured GET /api/v1/game/all
+2025-04-15 14:57:47 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/game/all", parameters={}
+2025-04-15 14:57:47 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.zenova.back_end.controller.GameController#getAllGames()
+2025-04-15 14:57:47 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+2025-04-15 14:57:47 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[GameDTO(id=14, name=Fast Food Rush, description=You're at Burger King, sinking your teeth into a ju (truncated)...]
+2025-04-15 14:57:47 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2025-04-15 14:57:48 [http-nio-8080-exec-5] DEBUG o.s.security.web.FilterChainProxy - Securing GET /api/v1/leaderboard/top?gameId=14
+2025-04-15 14:57:48 [http-nio-8080-exec-5] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2025-04-15 14:57:48 [http-nio-8080-exec-5] DEBUG o.s.security.web.FilterChainProxy - Secured GET /api/v1/leaderboard/top?gameId=14
+2025-04-15 14:57:48 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/leaderboard/top?gameId=14", parameters={masked}
+2025-04-15 14:57:48 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.zenova.back_end.controller.LeaderBoardController#getTopLeaderBoard(String)
+2025-04-15 14:57:48 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json, application/yaml]
+2025-04-15 14:57:48 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[LeaderBoardDTO(user=User(uid=6cca92da-6264-4037-b825-f542e09b1eb2, email=www.thilankathushani@gmail (truncated)...]
+2025-04-15 14:57:48 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
