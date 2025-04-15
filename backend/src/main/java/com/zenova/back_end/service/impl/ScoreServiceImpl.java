@@ -1,13 +1,13 @@
 package com.zenova.back_end.service.impl;
 
 import com.zenova.back_end.dto.GameDTO;
+import com.zenova.back_end.dto.LeaderBoardDTO;
 import com.zenova.back_end.dto.ScoreDTO;
 import com.zenova.back_end.dto.UserDTO;
 import com.zenova.back_end.entity.Game;
 import com.zenova.back_end.entity.Score;
 import com.zenova.back_end.entity.User;
 import com.zenova.back_end.repo.GameRepository;
-import com.zenova.back_end.repo.LeaderBoardRepository;
 import com.zenova.back_end.repo.ScoreRepository;
 import com.zenova.back_end.repo.UserRepository;
 import com.zenova.back_end.service.ScoreService;
@@ -16,15 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class ScoreServiceImpl implements ScoreService {
     @Autowired
     private ScoreRepository scoreRepository;
-
-    @Autowired
-    private LeaderBoardRepository leaderBoardRepository;
 
     @Autowired
     private GameRepository gameRepository;
@@ -39,7 +37,7 @@ public class ScoreServiceImpl implements ScoreService {
     @Override
     public ScoreDTO addScore(ScoreDTO score) {
         Game game = gameRepository.getReferenceById(String.valueOf(score.getGame().getId()));
-        User user = userRepository.getReferenceById(UUID.fromString(score.getUser().getEmail()));
+        User user = userRepository.getReferenceByEmail((score.getUser().getEmail()));
 
         score.setGame(modelMapper.map(game, GameDTO.class));
         score.setUser(modelMapper.map(user, UserDTO.class));
@@ -47,13 +45,17 @@ public class ScoreServiceImpl implements ScoreService {
         Score scoreEntity = modelMapper.map(score, Score.class);
         Score savedScore = scoreRepository.save(scoreEntity);
 
+        scoreEntity.setCreatedAt(LocalDateTime.now());
+
         ScoreDTO savedScoreDTO = modelMapper.map(savedScore, ScoreDTO.class);
 
         return savedScoreDTO;
     }
 
     @Override
-    public int getRank(ScoreDTO savedScore) {
-        return leaderBoardRepository.getRank(savedScore.getGame().getId(), savedScore.getUser().getEmail());
+    public List<LeaderBoardDTO> getTopLeaderBoard(String gameId) {
+        List<LeaderBoardDTO> leaderBoard = scoreRepository.findTopScoresByGameId(gameId);
+        return leaderBoard;
     }
+
 }

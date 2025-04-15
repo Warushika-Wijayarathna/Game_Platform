@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Token Receiver</title>
+    <script>
+        window.addEventListener('message', (event) => {
+            if (event.origin === 'http://localhost:5173' &&
+                event.data.type === 'SET_TOKEN') {
+                localStorage.setItem('token', event.data.token);
+                window.parent.postMessage({ type: 'TOKEN_RECEIVED' }, event.origin);
+            }
+        });
+    </script>
+</head>
+<body></body>
+</html>

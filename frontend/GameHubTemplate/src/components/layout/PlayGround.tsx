@@ -1,16 +1,40 @@
+import React, { useRef } from "react";
+
 interface PlayGroundProps {
     url?: string;
+    onFirstInteraction?: () => void;
 }
 
-export function PlayGround({ url }: PlayGroundProps) {
+export function PlayGround({ url, onFirstInteraction }: PlayGroundProps) {
+    const iframeRef = useRef<HTMLIFrameElement>(null);
+    const overlayRef = useRef<HTMLDivElement>(null);
+
+    const handleOverlayClick = () => {
+        if (onFirstInteraction) {
+            onFirstInteraction();
+            if (overlayRef.current) {
+                overlayRef.current.style.display = 'none';
+            }
+        }
+    };
+
     return (
-        <div className="h-full w-auto flex bg-gray-900">
+        <div className="h-full w-full bg-gray-900 relative">
+            <div
+                ref={overlayRef}
+                onClick={handleOverlayClick}
+                className="absolute inset-0 z-10 cursor-pointer"
+                style={{ backgroundColor: 'transparent' }}
+                aria-hidden="true"
+            />
             <iframe
+                ref={iframeRef}
                 src={url}
-                scrolling="no"
-                allowFullScreen
+                title="Game Preview"
+                allow="fullscreen"
                 loading="eager"
-                style={{ border: "0px", backgroundColor: "rgb(255, 255, 255)", width: "100%", height: "100%" }}
+                className="w-full h-full border-0 bg-white relative z-0"
+                referrerPolicy="strict-origin"
             />
         </div>
     );

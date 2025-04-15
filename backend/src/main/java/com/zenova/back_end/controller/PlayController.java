@@ -1,7 +1,6 @@
 package com.zenova.back_end.controller;
 
 import com.zenova.back_end.dto.*;
-import com.zenova.back_end.entity.Score;
 import com.zenova.back_end.service.ScoreService;
 import com.zenova.back_end.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +18,12 @@ public class PlayController {
     @Autowired
     private JwtUtil jwtUtil;
 
+
     @PostMapping("/game")
     public ResponseEntity<PlayResponseDTO> playGame(@RequestHeader("Authorization") String token, @RequestBody PlayRequestDTO playRequestDTO) {
+
+        token = token.replace("Bearer ", "");
+
         String userEmail = jwtUtil.getUsernameFromToken(token);
         if (userEmail == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new PlayResponseDTO("Invalid token", -1));
@@ -32,8 +35,7 @@ public class PlayController {
         score.setScore(playRequestDTO.getScoreValue());
 
         ScoreDTO savedScore = scoreService.addScore(score);
-        int newRank = scoreService.getRank(savedScore);
 
-        return ResponseEntity.ok(new PlayResponseDTO("Score recorded and leaderboard updated", newRank));
+        return ResponseEntity.ok(new PlayResponseDTO("Score recorded and leaderboard updated", 0));
     }
 }

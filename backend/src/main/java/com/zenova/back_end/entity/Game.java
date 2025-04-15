@@ -20,12 +20,14 @@ package com.zenova.back_end.entity;
         @Column(nullable = false)
         private String name;
 
+        @Lob
         private String description;
 
         @ManyToOne
         @JoinColumn(name = "category_id")
         private Category category;
 
+        @Lob
         private String rules;
         private String price;
         private String image;
