@@ -61,6 +61,7 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/api/livekit/token",
                                 "/api/v1/leaderboard/top",
                                 "/api/v1/deploy/vercel",
                                 "/api/v1/auth/authenticate",

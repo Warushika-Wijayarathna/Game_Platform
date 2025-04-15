@@ -1,30 +1,9 @@
-import { AccessToken } from 'livekit-server-sdk';
-
-export const generateLiveKitToken = async (canPublish: boolean, roomName: string, identity: string) => {
-    const apiKey = import.meta.env.NEXT_PUBLIC_LIVEKIT_API_KEY;
-    const apiSecret = import.meta.env.NEXT_PUBLIC_LIVEKIT_API_SECRET;
-
-    console.log("................................,,,,,,,,,,,,,,.>>>>>>>>>>>>>>>>.apiKey", apiKey);
-    console.log("apiSecret", apiSecret);
-
-    if (!apiKey || !apiSecret) {
-        throw new Error('LiveKit API credentials not configured');
-    }
-
-    const token = new AccessToken(apiKey, apiSecret, {
-        identity,
-        name: identity,
+export const generateLiveKitToken = async (isStreamer: boolean, gameId: string, role: "streamer" | "viewer") => {
+    const response = await fetch(`http://localhost:8080/api/livekit/token`, {
+        method: "POST",
+        body: JSON.stringify({ gameId, role }),
+        headers: { "Content-Type": "application/json" },
     });
-
-    // Add unique viewer identifiers
-    token.addGrant({
-        room: roomName,
-        roomJoin: true,
-        canPublish: false,
-        canSubscribe: true,
-        canPublishData: true,
-        roomAdmin: false,
-    });
-
-    return token.toJwt();
+    const data = await response.json();
+    return data.token;
 };

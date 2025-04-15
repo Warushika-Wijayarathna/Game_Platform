@@ -10,8 +10,16 @@ export interface Users {
 
 const USER_API_URL = 'http://localhost:8080/api/v1/user';
 
-export function saveUser() {
-    // Implementation to be added
+// get user
+export async function getUser() {
+    try {
+        const response = await axios.get(`${USER_API_URL}/get`);
+        console.log('Response: User', response);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        throw error;
+    }
 }
 
 export async function loadAllUsers() {
