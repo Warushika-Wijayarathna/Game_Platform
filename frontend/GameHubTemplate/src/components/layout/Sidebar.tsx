@@ -62,7 +62,7 @@ const Sidebar = ({ activeItem = "home", onMenuClick }: SidebarProps) => {
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <Gamepad2 className="w-8 h-8 text-[#FFB800]" />
-          <h1 className="text-2xl font-bold text-white">Gaming Hub</h1>
+          <h1 className="text-2xl font-bold text-white">Z-Play</h1>
         </div>
         <h1 className="tracking-tight lg:text-5xl text-[#8d8d8d] font-normal leading-4 text-[1xl]">
           A players space for fun
@@ -104,7 +104,7 @@ const Sidebar = ({ activeItem = "home", onMenuClick }: SidebarProps) => {
       </nav>
       <div className="mt-auto">
         <div className="p-4 bg-white/5 rounded-lg">
-          <p className="text-sm text-white/70 text-center">Gaming Hub v1.0</p>
+          <p className="text-sm text-white/70 text-center">Z-Play v1.0</p>
         </div>
       </div>
     </div>

@@ -14,9 +14,11 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -101,7 +103,7 @@ public class UserController {
         return ResponseEntity.ok(new ResponseDTO(VarList.OK, "Success", users));
     }
 
-    @PostMapping(value = "/update")
+    @PutMapping(value = "/update")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseDTO> updateUser(HttpServletRequest request, @RequestBody UserDTO userDTO) {
         userService.updateUser(userDTO);
@@ -152,4 +154,75 @@ public class UserController {
                     .body(new ResponseDTO(VarList.Internal_Server_Error, e.getMessage(), null));
         }
     }
+
+    @PutMapping(value = "/updateInfo")
+    public ResponseEntity<ResponseDTO> updateUserInfo(@RequestHeader("Authorization") String authHeader, @RequestBody Map<String, String> userInfo) {
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            Claims claims = jwtUtil.getAllClaimsFromToken(token);
+            String email = claims.getSubject();
+
+            String existingPassword = userInfo.get("existingPassword");
+            String newPassword = userInfo.get("password");
+
+            if (existingPassword == null || newPassword == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ResponseDTO(VarList.Bad_Request, "Both existing and new passwords are required", null));
+            }
+
+            boolean isValid = userService.validatePassword(email, existingPassword);
+            if (!isValid) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ResponseDTO(VarList.Unauthorized, "Invalid existing password", null));
+            }
+
+            userService.updatePassword(email, newPassword);
+
+            return ResponseEntity.ok(new ResponseDTO(VarList.OK, "Password updated successfully", null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDTO(VarList.Internal_Server_Error, e.getMessage(), null));
+        }
+    }
+
+    @PutMapping(value = "/updateInfos")
+    public ResponseEntity<ResponseDTO> updateUserInfos(@RequestHeader("Authorization") String authHeader, @RequestBody Map<String, UserDTO> userInfo) {
+
+        try {
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            String hashedPassword = passwordEncoder.encode("1234");
+            System.out.println("Hashed Password: " + hashedPassword);
+
+            String token = authHeader.replace("Bearer ", "");
+            Claims claims = jwtUtil.getAllClaimsFromToken(token);
+            String email = claims.getSubject();
+
+            String existingPassword = userInfo.get("password").getEmail();
+            UserDTO newUserInfo = userInfo.get("userInfo");
+
+            System.out.println("Existing Password: " + existingPassword);
+            System.out.println("New User Info: " + newUserInfo);
+
+
+            if (existingPassword == null || newUserInfo == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ResponseDTO(VarList.Bad_Request, "Both existing password and new user info are required", null));
+            }
+
+            boolean isValid = userService.validatePassword(email, existingPassword);
+            if (!isValid) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ResponseDTO(VarList.Unauthorized, "Invalid existing password", null));
+            }
+
+            userService.updateUser(newUserInfo);
+
+            return ResponseEntity.ok(new ResponseDTO(VarList.OK, "User info updated successfully", null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDTO(VarList.Internal_Server_Error, e.getMessage(), null));
+        }
+    }
 }
+
+

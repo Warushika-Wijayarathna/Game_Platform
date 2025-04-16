@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card.tsx";
 import { Apple, PlayCircle, Gamepad2 } from "lucide-react";
 import DailyRewards from "./rewards/DailyRewards.tsx";
+import Profile from "@/components/profile.tsx";
 
 interface NewsItem {
   id: string;
@@ -89,7 +90,7 @@ function addGames() {
 }
 
 export default function Home() {
-  const [activeSection, setActiveSection] = useState<"home" | "rewards">(
+  const [activeSection, setActiveSection] = useState<"home" | "rewards" | "store" | "profile">(
     "home",
   );
 
@@ -98,6 +99,10 @@ export default function Home() {
       setActiveSection("rewards");
     } else if (menuItem === "home") {
       setActiveSection("home");
+    } else if (menuItem === "home") {
+      setActiveSection("store");
+    } else if (menuItem === "profile") {
+      setActiveSection("profile");
     }
   };
 
@@ -108,7 +113,7 @@ export default function Home() {
         <Sidebar activeItem={activeSection} onMenuClick={handleMenuClick} />
       </div>
 
-      <div className="ml-80">
+      <div className="ml-80 w-full">
 
         <main className="flex-1 p-6">
           {activeSection === "home" ? (
@@ -121,11 +126,9 @@ export default function Home() {
                       className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-8">
-                    <h1 className="text-4xl font-bold text-white mb-4">
-                      Welcome to Z-Play
-                    </h1>
+                    <h1 className="text-4xl font-bold text-white mb-4">Welcome to Z-Play</h1>
                     <p className="text-lg text-white/90 mb-6">
-                      A Z-Play for every players to engage more fun
+                      A Z-Play for every player to engage more fun
                     </p>
                     <div className="flex gap-4">
                       <Button className="bg-[#FFB800] hover:bg-[#FFB800]/90 text-black">
@@ -144,16 +147,10 @@ export default function Home() {
                   <div className="space-y-8">
                     {/* Featured Content */}
                     <section>
-                      <h2 className="text-2xl font-bold text-white mb-6">
-                        Most Popular
-                      </h2>
+                      <h2 className="text-2xl font-bold text-white mb-6">Most Popular</h2>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
                         {defaultStoreItems.map((item) => (
-                            <Card
-                                key={item.id}
-                                className="bg-gray-800 text-white border-gray-700"
-                            >
+                            <Card key={item.id} className="bg-gray-800 text-white border-gray-700">
                               <CardHeader>
                                 <CardTitle>{item.name}</CardTitle>
                                 <CardDescription className="text-gray-400">
@@ -193,14 +190,9 @@ export default function Home() {
                             <TabsContent key={tab} value={tab} className="mt-6">
                               <div className="grid gap-6">
                                 {defaultNews
-                                    .filter(
-                                        (news) => tab === "ALL" || news.category === tab,
-                                    )
+                                    .filter((news) => tab === "ALL" || news.category === tab)
                                     .map((news) => (
-                                        <Card
-                                            key={news.id}
-                                            className="bg-gray-800 text-white border-gray-700"
-                                        >
+                                        <Card key={news.id} className="bg-gray-800 text-white border-gray-700">
                                           <CardHeader>
                                             <div className="flex justify-between items-start">
                                               <div>
@@ -209,9 +201,7 @@ export default function Home() {
                                                   {news.date}
                                                 </CardDescription>
                                               </div>
-                                              <span className="text-sm text-[#FFB800]">
-                                      {news.category}
-                                    </span>
+                                              <span className="text-sm text-[#FFB800]">{news.category}</span>
                                             </div>
                                           </CardHeader>
                                           <CardContent>
@@ -232,14 +222,9 @@ export default function Home() {
 
                   {/* Right Sidebar */}
                   <aside className="space-y-6">
-                    <h2 className="text-2xl font-bold text-white">
-                      Upcoming Events
-                    </h2>
+                    <h2 className="text-2xl font-bold text-white">Upcoming Events</h2>
                     {defaultEvents.map((event) => (
-                        <Card
-                            key={event.id}
-                            className="bg-gray-800 text-white border-gray-700"
-                        >
+                        <Card key={event.id} className="bg-gray-800 text-white border-gray-700">
                           <CardHeader>
                             <CardTitle className="text-lg">{event.title}</CardTitle>
                             <CardDescription className="text-gray-400">
@@ -251,11 +236,14 @@ export default function Home() {
                   </aside>
                 </div>
               </>
-          ) : (
+          ) : activeSection === "rewards" ? (
               <DailyRewards />
-          )}
+          ) : activeSection === "profile" ? (
+              <Profile />
+          ) : null}
         </main>
       </div>
     </div>
   );
 }
+

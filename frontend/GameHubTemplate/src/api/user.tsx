@@ -117,10 +117,10 @@ export async function updateUser(user: { name: string | undefined }): Promise<Us
     }
 }
 
-export async function updateInfoUser(user: { password: string | undefined, existingPassword: string | undefined }): Promise<Users> {
+export async function updateInfoUsers(user: { password: string | undefined, userInfo: Users}): Promise<Users> {
     try {
         const token = localStorage.getItem('token');
-        const response = await axios.put<Users>(`${USER_API_URL}/updateInfo`, user, {
+        const response = await axios.put<Users>(`${USER_API_URL}/updateInfos`, user, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,

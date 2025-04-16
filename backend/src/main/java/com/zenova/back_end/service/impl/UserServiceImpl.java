@@ -88,7 +88,13 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         if (userRepository.existsByEmail(userDTO.getEmail())) {
             User user = userRepository.findByEmail(userDTO.getEmail());
             modelMapper.map(userDTO, user);
+            if (userDTO.getPassword() != null) {
+                BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+                user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+            }
+
             userRepository.save(user);
+
         }
     }
 
@@ -130,6 +136,27 @@ public class UserServiceImpl implements UserDetailsService, UserService {
                 user.setActive(true);
                 userRepository.save(user);
             }
+        }
+    }
+
+    @Override
+    public boolean validatePassword(String email, String existingPassword) {
+        if (userRepository.existsByEmail(email)) {
+            User user = userRepository.findByEmail(email);
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            return passwordEncoder.matches(existingPassword, user.getPassword());
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public void updatePassword(String email, String newPassword) {
+        if (userRepository.existsByEmail(email)) {
+            User user = userRepository.findByEmail(email);
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
         }
     }
 

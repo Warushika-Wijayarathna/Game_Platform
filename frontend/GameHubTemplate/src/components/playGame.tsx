@@ -190,9 +190,6 @@ export default function PlayGame() {
         }
     };
 
-
-
-
     const stopStreaming = async () => {
         if (room) {
             room.localParticipant.trackPublications.forEach((pub) => pub.track?.stop());

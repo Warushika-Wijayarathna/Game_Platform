@@ -7,12 +7,28 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
 import { fetchAllGames, Games } from "../api/games";
 import ErrorBoundary from "../components/ErrorBoundary";
+import DailyRewards from "@/components/rewards/DailyRewards.tsx";
 
 export default function Store() {
     const navigate = useNavigate();
     const [games, setGames] = useState<Games[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [activeSection, setActiveSection] = useState<"home" | "rewards" | "store" | "profile">(
+        "store",
+    );
+
+    const handleMenuClick = (menuItem: string) => {
+        if (menuItem === "rewards") {
+            setActiveSection("rewards");
+        } else if (menuItem === "home") {
+            setActiveSection("home");
+        } else if (menuItem === "store") {
+            setActiveSection("store");
+        } else if (menuItem === "profile") {
+            setActiveSection("profile");
+        }
+    };
 
     useEffect(() => {
         const loadGames = async () => {
@@ -54,7 +70,7 @@ export default function Store() {
                 </CardDescription>
             </CardHeader>
             <CardFooter className="flex justify-between items-center">
-                <span className="text-[#FFB800] font-bold">{game.price || 'Free'}</span>
+                {/*<span className="text-[#FFB800] font-bold">{game.price || 'Free'}</span>*/}
                 <Button
                     className="bg-[#FFB800] hover:bg-[#FFB800]/90 text-black"
                     onClick={() => handlePlayClick(game)}
@@ -69,14 +85,14 @@ export default function Store() {
         <ErrorBoundary fallback={<div className="text-red-500 p-4">Store component failed to load</div>}>
             <div className="min-h-screen flex bg-gray-900">
                 <div className="h-full fixed">
-                    <Sidebar activeItem="store" />
+                    <Sidebar activeItem={activeSection} onMenuClick={handleMenuClick} />
                 </div>
                 <div className="ml-80 flex-1 p-8">
                     {loading ? (
                         <div className="text-white text-center">Loading games...</div>
                     ) : error ? (
                         <div className="text-red-500 text-center">{error}</div>
-                    ) : (
+                    ) : activeSection === "store" ? (
                         <main className="max-w-7xl mx-auto">
                             <h1 className="text-3xl font-bold text-white mb-8">Game Store</h1>
                             {categories.map((category) => (
@@ -92,6 +108,8 @@ export default function Store() {
                                 </section>
                             ))}
                         </main>
+                    ) : (
+                        <DailyRewards />
                     )}
                 </div>
             </div>

@@ -24,4 +24,8 @@ public interface UserService {
     UserDTO getUserByEmail(String email);
 
     void activateUser(UUID userId);
+
+    boolean validatePassword(String email, String existingPassword);
+
+    void updatePassword(String email, String newPassword);
 }

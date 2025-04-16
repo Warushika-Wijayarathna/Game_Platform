@@ -7,7 +7,7 @@ import routes from "tempo-routes";
 import { TooltipProvider } from "@/components/ui/tooltip.tsx";
 import PlayGame from "./components/playGame.tsx";
 import WatchStream from "@/components/WatchStream.tsx";
-
+import Profile from "./components/profile.tsx";
 
 function App() {
   useEffect(() => {
@@ -33,6 +33,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/store" element={<Store />} />
             <Route path="/rewards" element={<DailyRewards />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/playGame" element={<PlayGame />} />
             <Route path="/watch/:gameId" element={<WatchStream />} />
           </Routes>
