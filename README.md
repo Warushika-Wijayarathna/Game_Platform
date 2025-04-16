@@ -11,7 +11,7 @@ Z-Play is a modern and interactive game platform that lets users browse, and cla
 - 🎁 Daily Login Rewards  
 - 🔐 Firebase Authentication  
 - 🧸 Avatar Generation via DiceBear  
-- 🎤 Real-Time Voice Chat with LiveKit  
+- 🎤 Chat with LiveKit  
 - 📊 Interactive Admin Dashboard  
 
 ---
