@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
-import { fetchAllGames, Games } from "../api/games";
+import {fetchAllGames, Games, User} from "../api/games";
 import ErrorBoundary from "../components/ErrorBoundary";
 import DailyRewards from "@/components/rewards/DailyRewards.tsx";
 import ChatUi from "@/components/chat/chatUi.tsx";
@@ -22,10 +22,11 @@ export default function Store() {
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [activeDonorId, setActiveDonorId] = useState<number | null>(null);
 
-    function handleChatOpen(s: string) {
+    function handleChatOpen(event: React.MouseEvent<HTMLButtonElement>) {
         setActiveDonorId(1);
         setIsChatOpen(true);
     }
+
     const handleChatClose = () => {
         setIsChatOpen(false);
         setActiveDonorId(null);
@@ -48,7 +49,7 @@ export default function Store() {
             try {
                 const data = await fetchAllGames();
                 setGames(data);
-                setError("");
+            setError("");
             } catch (err) {
                 setError(err instanceof Error ? err.message : "Failed to load games");
             } finally {
@@ -58,7 +59,9 @@ export default function Store() {
         loadGames();
     }, []);
 
-    const categories = Array.from(new Set(games.map(game => game.category))).filter(Boolean) as string[];
+    const categories = Array.from(
+        new Set(games.map(game => game.category?.name || 'Uncategorized'))
+    ).filter(Boolean) as string[];
 
     const handlePlayClick = (game: Games) => {
         navigate("/playGame", { state: { game } });
@@ -108,14 +111,16 @@ export default function Store() {
                     ) : activeSection === "store" ? (
                         <main className="max-w-7xl mx-auto">
                             <h1 className="text-3xl font-bold text-white mb-8">Game Store</h1>
-                            {categories.map((category) => (
+                            {categories.map(category => (
                                 <section key={category} className="mb-12">
-                                    <h2 className="text-2xl font-bold text-white mb-6">{category}</h2>
+                                    <h2 className="text-2xl font-bold text-white mb-6">
+                                        {category}
+                                    </h2>
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {games
-                                            .filter(game => game.category === category)
+                                            .filter(game => game.category?.name === category)
                                             .map(game => (
-                                                <GameCard key={game.id} game={game}/>
+                                                <GameCard key={game.id} game={game} />
                                             ))}
                                     </div>
                                 </section>
@@ -126,7 +131,6 @@ export default function Store() {
                     )}
                 </div>
                 <button
-
                     onClick={handleChatOpen}
                     className="px-3 py-2 text-sm font-medium text-white bg-yellow-400 rounded hover:bg-yellow-600 absolute right-2.5 bottom-10"
                 >

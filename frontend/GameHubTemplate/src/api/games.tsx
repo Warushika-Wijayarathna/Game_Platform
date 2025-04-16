@@ -9,41 +9,22 @@ export interface User {
 }
 
 export interface Games {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  rules: string;
-  price: string;
-  image: string;
-  hostedUrl: string;
-  active: boolean;
-  uploadedBy: User;
-  isApproved: boolean;
+    id: string;
+    name: string;
+    description: string;
+    category: { id: number; name: string; active: boolean };
+    rules: string;
+    price: string;
+    image: string;
+    hostedUrl: string;
+    active: boolean;
+    uploadedBy: User;
+    isApproved: boolean;
 }
 
 const BASE_URL = "http://localhost:8080/api/v1/game";
 const API_TIMEOUT = 10000;
 
-const validateGame = (game: any): Games => {
-  if (!game.id || typeof game.name !== 'string') {
-    throw new Error('Invalid game data structure');
-  }
-
-  return {
-    id: game.id,
-    name: game.name || 'Untitled Game',
-    description: game.description || '',
-    category: game.category?.name || game.category || 'Uncategorized',
-    rules: game.rules || '',
-    price: game.price || 'Free',
-    image: game.image || '/fallback-game.png',
-    hostedUrl: game.hostedUrl || '#',
-    active: game.active || false,
-    uploadedBy: game.uploadedBy || { uid: '', name: '', email: '', role: '', active: false },
-    isApproved: game.isApproved || false
-  };
-};
 
 export const fetchAllGames = async (): Promise<Games[]> => {
   try {
@@ -58,7 +39,7 @@ export const fetchAllGames = async (): Promise<Games[]> => {
       throw new Error('Invalid API response format');
     }
 
-    return response.data.map(game => validateGame(game));
+    return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const message = error.response?.data?.message || 'Network Error';
@@ -69,7 +50,6 @@ export const fetchAllGames = async (): Promise<Games[]> => {
 };
 
 export const uploadDeveloperGames = async (game: Games): Promise<Games> => {
-    try {
         console.log('Uploading game:', game);
         const gameJson = JSON.stringify(game);
 
@@ -81,12 +61,5 @@ export const uploadDeveloperGames = async (game: Games): Promise<Games> => {
         timeout: API_TIMEOUT
         });
 
-        return validateGame(response.data);
-    } catch (error) {
-        if (axios.isAxiosError(error)) {
-        const message = error.response?.data?.message || 'Network Error';
-        throw new Error(`Failed to upload game: ${message}`);
-        }
-        throw new Error('Failed to upload game. Please try again later.');
-    }
+        return response.data;
 }

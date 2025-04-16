@@ -136,13 +136,12 @@ const GameUploadModal = ({ onClose }) => {
             }
         };
 
-        try {
-            await uploadDeveloperGames(game);
-            console.log("Game data submitted:", gameData);
-            onClose();
-        } catch (error) {
-            console.error("Failed to submit game data:", error);
-        }
+
+        await uploadDeveloperGames(game);
+        console.log("Game data submitted:", gameData);
+        alert("Game uploaded successfully!");
+        onClose();
+
     };
 
     return (

@@ -42,15 +42,12 @@ function App() {
               <Route path="/profile" element={<Profile/>}/>
               <Route path="/playGame" element={<PlayGame/>}/>
               <Route path="/watch/:gameId" element={<WatchStream/>}/>
-              <Route path="/chat" element={<Chat/>}/>
+              {/*<Route path="/chat" element={<Chat/>}/>*/}
 
             </Routes>
             {import.meta.env.VITE_TEMPO === "true" && useRoutes(routes)}
           </>
         </Suspense>
-
-
-
 
 
       </TooltipProvider>
