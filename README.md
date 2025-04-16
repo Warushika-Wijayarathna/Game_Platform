@@ -27,8 +27,8 @@ Z-Play is a modern and interactive game platform that lets users browse, and cla
 ### ⬆️ Game Upload Form  
 ![Game Upload Form](screenshots/upload_form.png)
 
-### 🎉 Daily Rewards  
-![Daily Rewards](screenshots/daily_rewards.png)
+### 🎮 Game Page
+![Game Page](screenshots/game_page.png)
 
 ---
 

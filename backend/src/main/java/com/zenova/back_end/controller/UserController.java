@@ -138,10 +138,10 @@ public class UserController {
         try {
             // Remove the "Bearer " prefix from the token
             String token = authHeader.replace("Bearer ", "");
-            System.out.println("Parsed Token: " + token); // Log the parsed token
+            System.out.println("Parsed Token: " + token);
 
             Claims claims = jwtUtil.getAllClaimsFromToken(token);
-            String email = claims.getSubject(); // Use getSubject() instead of claims.get("email")
+            String email = claims.getSubject();
             System.out.println("Email: " + email);
 
             UserDTO userDTO = userService.getUserByEmail(email);

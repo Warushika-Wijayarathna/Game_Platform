@@ -148,7 +148,6 @@ public class GameServiceImpl implements GameService {
             game.setPrice("0.00");
         }
 
-        // if isapproved is null set it to false
         if (game.getIsApproved() == null) {
             game.setIsApproved(false);
         }
