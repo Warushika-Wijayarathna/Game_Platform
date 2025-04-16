@@ -8,6 +8,7 @@ import { faPlay } from "@fortawesome/free-solid-svg-icons";
 import { fetchAllGames, Games } from "../api/games";
 import ErrorBoundary from "../components/ErrorBoundary";
 import DailyRewards from "@/components/rewards/DailyRewards.tsx";
+import ChatUi from "@/components/chat/chatUi.tsx";
 
 export default function Store() {
     const navigate = useNavigate();
@@ -17,6 +18,18 @@ export default function Store() {
     const [activeSection, setActiveSection] = useState<"home" | "rewards" | "store" | "profile">(
         "store",
     );
+
+    const [isChatOpen, setIsChatOpen] = useState(false);
+    const [activeDonorId, setActiveDonorId] = useState<number | null>(null);
+
+    function handleChatOpen(s: string) {
+        setActiveDonorId(1);
+        setIsChatOpen(true);
+    }
+    const handleChatClose = () => {
+        setIsChatOpen(false);
+        setActiveDonorId(null);
+    };
 
     const handleMenuClick = (menuItem: string) => {
         if (menuItem === "rewards") {
@@ -85,7 +98,7 @@ export default function Store() {
         <ErrorBoundary fallback={<div className="text-red-500 p-4">Store component failed to load</div>}>
             <div className="min-h-screen flex bg-gray-900">
                 <div className="h-full fixed">
-                    <Sidebar activeItem={activeSection} onMenuClick={handleMenuClick} />
+                    <Sidebar activeItem={activeSection} onMenuClick={handleMenuClick}/>
                 </div>
                 <div className="ml-80 flex-1 p-8">
                     {loading ? (
@@ -102,16 +115,31 @@ export default function Store() {
                                         {games
                                             .filter(game => game.category === category)
                                             .map(game => (
-                                                <GameCard key={game.id} game={game} />
+                                                <GameCard key={game.id} game={game}/>
                                             ))}
                                     </div>
                                 </section>
                             ))}
                         </main>
                     ) : (
-                        <DailyRewards />
+                        <DailyRewards/>
                     )}
                 </div>
+                <button
+
+                    onClick={handleChatOpen}
+                    className="px-3 py-2 text-sm font-medium text-white bg-yellow-400 rounded hover:bg-yellow-600 absolute right-2.5 bottom-10"
+                >
+                    Chat
+                </button>
+
+                {isChatOpen && (
+                    <ChatUi
+                        donorId={activeDonorId}
+                        onClose={handleChatClose}
+                    />
+                )}
+
             </div>
         </ErrorBoundary>
     );

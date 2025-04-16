@@ -10,7 +10,7 @@ import "firebase/compat/storage";
 import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import "firebase/compat/storage";
 import { storage } from "@/config/firebase-config";
-import {User} from "lucide-react";
+import ChatUi from "@/components/chat/chatUi.tsx";
 
 const styles = ["pixel", "bottts", "avataaars", "micah", "adventurer"];
 const skinTones = ["#ffdbac", "#f1c27d", "#e0ac69", "#c68642", "#8d5524"];
@@ -146,6 +146,7 @@ const GameUploadModal = ({ onClose }) => {
     };
 
     return (
+
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -366,7 +367,7 @@ export default function Profile() {
                     updatedProfile={profile}
                 />
             )}
-            {showGameModal && <GameUploadModal onClose={() => setShowGameModal(false)} />}
+            {showGameModal && <GameUploadModal onClose={() => setShowGameModal(false)}/>}
 
             {/* Profile Header */}
             <div className="mb-10 flex items-center gap-4">
@@ -421,14 +422,14 @@ export default function Profile() {
                 {/* Developer Section */}
                 <motion.div
                     className="bg-gray-800 p-6 rounded-xl shadow-xl"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
+                    initial={{opacity: 0, y: 20}}
+                    animate={{opacity: 1, y: 0}}
+                    transition={{duration: 0.6}}
                 >
                     {!isDeveloper ? (
                         <>
                             <h2 className="text-lg font-bold text-yellow-400 flex items-center gap-2">
-                                <FaRocket /> Want to become a ZPlay Developer?
+                                <FaRocket/> Want to become a ZPlay Developer?
                             </h2>
                             <p className="text-gray-300 mt-2 mb-4">
                                 Join our creator community and share your games with the world.
@@ -442,9 +443,9 @@ export default function Profile() {
                         </>
                     ) : (
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.5 }}
+                            initial={{opacity: 0, scale: 0.9}}
+                            animate={{opacity: 1, scale: 1}}
+                            transition={{duration: 0.5}}
                         >
                             <h2 className="text-xl font-bold text-white mb-2">
                                 Welcome, Developer!
@@ -534,6 +535,8 @@ export default function Profile() {
                     </div>
                 </div>
             </div>
+
+
         </div>
     );
 }

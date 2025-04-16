@@ -51,8 +51,10 @@ const Sidebar = ({ activeItem = "home", onMenuClick }: SidebarProps) => {
   ];
 
   const handleClick = (item: NavItem) => {
+    console.log("Clicked item:", item);
     if (item.path) {
       navigate(item.path);
+
     }
     onMenuClick?.(item.id);
   };
