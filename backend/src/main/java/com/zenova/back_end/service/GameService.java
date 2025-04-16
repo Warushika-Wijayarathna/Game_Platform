@@ -1,6 +1,7 @@
 package com.zenova.back_end.service;
 
 import com.zenova.back_end.dto.GameDTO;
+import com.zenova.back_end.dto.UserDTO;
 
 import java.util.List;
 
@@ -16,4 +17,6 @@ public interface GameService {
     List<GameDTO> getAllActiveGames();
 
     Object purchaseGame(String token, Long id);
+
+    Object uploadGame(GameDTO gameDTO, UserDTO userDTO);
 }

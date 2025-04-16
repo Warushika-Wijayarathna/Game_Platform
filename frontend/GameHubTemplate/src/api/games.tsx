@@ -67,3 +67,26 @@ export const fetchAllGames = async (): Promise<Games[]> => {
     throw new Error('Failed to load games. Please try again later.');
   }
 };
+
+export const uploadDeveloperGames = async (game: Games): Promise<Games> => {
+    try {
+        console.log('Uploading game:', game);
+        const gameJson = JSON.stringify(game);
+
+        const response = await axios.post(`${BASE_URL}/upload`, gameJson, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
+        timeout: API_TIMEOUT
+        });
+
+        return validateGame(response.data);
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+        const message = error.response?.data?.message || 'Network Error';
+        throw new Error(`Failed to upload game: ${message}`);
+        }
+        throw new Error('Failed to upload game. Please try again later.');
+    }
+}

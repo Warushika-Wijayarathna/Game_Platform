@@ -2,6 +2,7 @@ package com.zenova.back_end.service.impl;
 
 import com.zenova.back_end.dto.GameDTO;
 import com.zenova.back_end.dto.PurchaseDTO;
+import com.zenova.back_end.dto.UserDTO;
 import com.zenova.back_end.entity.Category;
 import com.zenova.back_end.entity.Game;
 import com.zenova.back_end.entity.Purchase;
@@ -136,6 +137,38 @@ public class GameServiceImpl implements GameService {
         purchaseRepository.save(purchase);
 
         return modelMapper.map(purchase, PurchaseDTO.class);
+    }
+
+    @Override
+    public Object uploadGame(GameDTO gameDTO, UserDTO userDTO) {
+        User user = userRepository.findByUid(userDTO.getUid());
+        Game game = modelMapper.map(gameDTO, Game.class);
+
+        if (game.getPrice() == null || game.getPrice().isEmpty()) {
+            game.setPrice("0.00");
+        }
+
+        // if isapproved is null set it to false
+        if (game.getIsApproved() == null) {
+            game.setIsApproved(false);
+        }
+
+        game.setUploadedBy(user);
+
+        Category category = game.getCategory();
+        if (category != null && category.getId() == 0) {
+            category = categoryRepository.save(category);
+            game.setCategory(category);
+        }
+
+        game = gameRepository.save(game);
+
+        if(user.getRole()== Role.USER){
+            user.setRole(Role.DEVELOPER);
+            userRepository.save(user);
+        }
+
+        return modelMapper.map(game, GameDTO.class);
     }
 
 }
