@@ -155,7 +155,7 @@ You can use this `avatarUrl` as the user’s profile picture across the app.
 ## 🎬 Demo Video
 
 Watch the full platform in action:  
-📽️ **[▶️ Z-Play Demo](#)** 
+📽️ **[▶️ Z-Play Demo](#)(https://www.youtube.com/watch?v=J1aXoBOdZCc)** 
 
 ---
 
