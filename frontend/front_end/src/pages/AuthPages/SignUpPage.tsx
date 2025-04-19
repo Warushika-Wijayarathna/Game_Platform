@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { signup } from '../../api/auth';
 
-
 const SignUpForm: React.FC = () => {
     const [name, setName] = useState<string>('');
     const [email, setEmail] = useState<string>('');
@@ -16,7 +15,6 @@ const SignUpForm: React.FC = () => {
 
         if (password !== confirmPassword) {
             setError('Passwords do not match');
-            console.error('Passwords do not match');
             return;
         }
 
@@ -24,7 +22,6 @@ const SignUpForm: React.FC = () => {
             const data = await signup(name, email, password);
             setError(data.message);
         } catch (error: unknown) {
-            console.error('Signup error:', error);
             if (error instanceof Error) {
                 setError(error.message);
             } else {
@@ -33,6 +30,10 @@ const SignUpForm: React.FC = () => {
         }
     };
 
+    const handleFacebookLogin = () => {
+        // Replace with your backend OAuth URL
+        window.location.href = 'http://localhost:8080/oauth2/authorization/facebook';
+    };
 
     return (
         <div className="flex justify-center items-center bg-gray-100 font-[sans-serif] h-full md:min-h-screen p-4">
@@ -75,26 +76,44 @@ const SignUpForm: React.FC = () => {
                         required
                     />
 
-                    <button type="submit" className="w-full py-2.5 px-4 text-sm font-semibold rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
+                    <button
+                        type="submit"
+                        className="w-full py-2.5 px-4 text-sm font-semibold rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
+                    >
                         Sign Up
                     </button>
 
                     <p className="text-sm text-center mt-6">
                         Already have an account?
-                        <Link to="/login" className="text-blue-600 font-semibold hover:underline">Sign in</Link>
+                        <Link to="/login" className="text-blue-600 font-semibold hover:underline ml-1">
+                            Sign in
+                        </Link>
                     </p>
 
                     <hr className="my-6 border-gray-300" />
 
                     <div className="space-x-6 flex justify-center">
                         <button type="button" className="border-none outline-none">
-                            <img src="https://img.icons8.com/color/30/google-logo.png" alt="Google Sign Up" />
+                            <img
+                                src="https://img.icons8.com/color/30/google-logo.png"
+                                alt="Google Sign Up"
+                            />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleFacebookLogin}
+                            className="border-none outline-none"
+                        >
+                            <img
+                                src="https://img.icons8.com/ios-filled/30/facebook.png"
+                                alt="Facebook Sign Up"
+                            />
                         </button>
                         <button type="button" className="border-none outline-none">
-                            <img src="https://img.icons8.com/ios-filled/30/facebook.png" alt="Facebook Sign Up" />
-                        </button>
-                        <button type="button" className="border-none outline-none">
-                            <img src="https://img.icons8.com/color/30/twitter--v1.png" alt="Twitter Sign Up" />
+                            <img
+                                src="https://img.icons8.com/color/30/twitter--v1.png"
+                                alt="Twitter Sign Up"
+                            />
                         </button>
                     </div>
                 </form>

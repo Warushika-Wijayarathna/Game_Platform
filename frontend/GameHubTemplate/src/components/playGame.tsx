@@ -1,453 +1,308 @@
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate, useNavigationType } from "react-router-dom";
-import Sidebar from "@/components/layout/Sidebar";
-import { PlayGround } from "@/components/layout/PlayGround";
-import PlaygroundBottomAction from "@/components/ui/playgroundBottomAction";
-import { Games } from "@/api/games";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import ErrorBoundary from "@/components/ErrorBoundary";
-import {
-    Dialog,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
-import { saveGameScore } from "@/api/play";
-import { getLeaderboardForGame } from "@/api/leaderboard";
-import {
-    Participant,
-    Room,
-    RoomEvent,
-    Track,
-    TrackPublication,
-} from "livekit-client";
-import { generateLiveKitToken } from "@/lib/livekit";
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Room, Track, RemoteParticipant, RemoteTrackPublication } from 'livekit-client';
+import { v4 as uuidv4 } from 'uuid';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, Copy, VideoOff, Video, ScreenShare, ScreenShareOff } from 'lucide-react';
+import {Games, getGameById} from '@/api/games';
+import { generateLiveKitToken } from '@/lib/livekit';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { saveGameScore } from '@/api/play';
+import { getLeaderboardForGame } from '@/api/leaderboard';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import Sidebar from '@/components/layout/Sidebar';
+import PlaygroundBottomAction from '@/components/ui/playgroundBottomAction';
 
-const isValidUrl = (urlString: string) => {
-    try {
-        return Boolean(new URL(urlString));
-    } catch {
-        return false;
-    }
-};
-
-const validateGameData = (gameData: unknown): Games => {
-    if (!gameData || typeof gameData !== "object") {
-        throw new Error("Invalid game data structure");
-    }
-
-    const requiredFields = ["id", "name", "hostedUrl"];
-    const missingFields = requiredFields.filter(
-        (field) => !(field in gameData)
-    );
-
-    if (missingFields.length > 0) {
-        throw new Error(`Missing required fields: ${missingFields.join(", ")}`);
-    }
-
-    const game = gameData as Games;
-    if (!isValidUrl(game.hostedUrl)) {
-        throw new Error("Invalid game URL format");
-    }
-
-    return game;
-};
+// @ts-ignore
+const LIVEKIT_URL = 'wss://zplay-gqa8611x.livekit.cloud' || 'wss://your-livekit-server-url';
 
 export default function PlayGame() {
-    const location = useLocation();
     const navigate = useNavigate();
-    const navigationType = useNavigationType();
-
-    const [game, setGame] = useState<Games | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [gameStarted, setGameStarted] = useState(false);
-    const [currentScore, setCurrentScore] = useState(0);
-    const [showExitConfirm, setShowExitConfirm] = useState(false);
-    const [isSaving, setIsSaving] = useState(false);
-    const [sessionKey, setSessionKey] = useState(Date.now());
-    const [exitDialogOpen, setExitDialogOpen] = useState(false);
-    const [leaderboard, setLeaderboard] = useState<{ name: string; score: number }[]>([]);
-    const [leaderboardLoading, setLeaderboardLoading] = useState(false);
+    const location = useLocation();
 
     const [room, setRoom] = useState<Room | null>(null);
+    const [game, setGame] = useState<Games | null>(null);
     const [isStreaming, setIsStreaming] = useState(false);
-    const [isWatching, setIsWatching] = useState(false);
-    const [streamError, setStreamError] = useState("");
+    const [streamError, setStreamError] = useState('');
+    const [screenStream, setScreenStream] = useState<MediaStream | null>(null);
+    const [webcamStream, setWebcamStream] = useState<MediaStream | null>(null);
+    const [showExitConfirm, setShowExitConfirm] = useState(false);
+    const [currentScore, setCurrentScore] = useState(0);
+    const [leaderboard, setLeaderboard] = useState<{ name: string; score: number }[]>([]);
+    const [showDialog, setShowDialog] = useState(false);
+    const [gameStarted, setGameStarted] = useState(false);
 
-    const liveKitUrl = "wss://zplay-gqa8611x.livekit.cloud";
+    const { gameId } = useParams<{ gameId: string }>();
 
     useEffect(() => {
-        if (!room) return;
-
-        const handleTrackSubscribed = (
-            track: Track,
-            publication: TrackPublication,
-            participant: Participant
-        ) => {
-            debugger; // Pause here to inspect the track details
-            console.log("Track received:", track);
-
-            if (track.kind === "video") {
-                const videoElement = document.getElementById("stream-video") as HTMLVideoElement;
-                if (videoElement) {
-                    console.log("Attaching track to video element:", videoElement);
-                    track.attach(videoElement);
-                    videoElement.play(); // Make sure the video starts playing
-                    console.log("Video element play triggered");
-                } else {
-                    console.warn("No video element found with id 'stream-video'");
+        const loadGameData = async () => {
+            try {
+                if (!gameId) {
+                    throw new Error("Missing game ID");
                 }
+
+                const gameData = await getGameById(gameId);
+                setGame(gameData);
+
+                const lbData = await getLeaderboardForGame(gameId!);
+                setLeaderboard(lbData.map(item => ({
+                    name: item.user.name,
+                    score: item.totalScore
+                })));
+
+            } catch (err) {
+                console.error("Game load failed:", err);
+                navigate("/store"); // Redirect to store if gameId is missing
             }
         };
 
-        room.on(RoomEvent.TrackSubscribed, handleTrackSubscribed);
-
-        // Clean up
-        return () => {
-            room.off(RoomEvent.TrackSubscribed, handleTrackSubscribed);
-        };
-    }, [room]);
+        loadGameData();
+    }, [gameId, navigate]);
 
 
-    useEffect(() => {
-        return () => {
-            if (room) {
-                room.disconnect();
-                setRoom(null);
-            }
-        };
-    }, []);
+
 
     const startStreaming = async () => {
         try {
-            alert("When prompted, please select the browser tab or window that displays the game.");
-            console.log("▶ Starting screen capture...");
+            setStreamError('');
 
-            const stream = await navigator.mediaDevices.getDisplayMedia({
-                video: { width: 1280, height: 720 },
-                audio: true,
+            // Request screen share and webcam simultaneously
+            const [screenMedia, webcamMedia] = await Promise.all([
+                navigator.mediaDevices.getDisplayMedia({
+                    video: { width: 1920, height: 1080, frameRate: 30 },
+                    audio: true
+                }),
+                navigator.mediaDevices.getUserMedia({
+                    video: { width: 1280, height: 720, frameRate: 30 },
+                    audio: true
+                })
+            ]);
+
+            setScreenStream(screenMedia);
+            setWebcamStream(webcamMedia);
+
+            // Generate unique participant ID
+            const participantId = `streamer-${uuidv4()}`;
+            const token = await generateLiveKitToken(true, gameId!, 'streamer'); // Pass all required arguments
+
+            const newRoom = new Room({
+                publishDefaults: {
+                    screenShareEncoding: {
+                        maxBitrate: 3_000_000,
+                        maxFramerate: 30
+                    }
+                }
             });
 
-            console.log("✅ Screen capture stream obtained:", stream);
-            console.log("Tracks:", stream.getTracks());
-            console.log("Video Tracks:", stream.getVideoTracks());
-            console.log("Audio Tracks:", stream.getAudioTracks());
+            // Connect to LiveKit
+            await newRoom.connect(LIVEKIT_URL, token);
 
-            const videoTracks = stream.getVideoTracks();
-            const audioTracks = stream.getAudioTracks();
-
-            if (videoTracks.length === 0) {
-                console.error("❌ No video track found in stream.");
-                throw new Error("No video track available for streaming.");
-            }
-
-            const videoTrack = videoTracks[0];
-            const audioTrack = audioTracks[0];
-
-            console.log("🎥 Video track readyState:", videoTrack.readyState);
-            console.log("🎧 Audio track readyState:", audioTrack?.readyState);
-            console.log("🔄 Stream active:", stream.active);
-
-            const token = await generateLiveKitToken(true, game!.id, "streamer");
-            console.log("🔐 LiveKit Token:", token);
-            console.log("🌐 LiveKit URL:", liveKitUrl);
-
-            const newRoom = new Room();
-
-            newRoom.on(RoomEvent.Disconnected, (reason) => {
-                console.warn("⚠️ Disconnected from room:", reason);
-                setStreamError(`Disconnected: ${reason}`);
+            // Publish screen share track
+            await newRoom.localParticipant.publishTrack(screenMedia.getVideoTracks()[0], {
+                name: 'screen',
+                source: Track.Source.ScreenShare,
+                simulcast: false
             });
 
-            newRoom.on(RoomEvent.ConnectionStateChanged, (state) => {
-                console.log("🔄 Room connection state:", state);
+            // Publish webcam track
+            await newRoom.localParticipant.publishTrack(webcamMedia.getVideoTracks()[0], {
+                name: 'webcam',
+                source: Track.Source.Camera,
+                simulcast: true
             });
 
-            console.log("🔌 Connecting to LiveKit...");
-            await newRoom.connect(liveKitUrl, token);
-            console.log("✅ Connected to room:", newRoom.name);
+            // Publish audio from webcam
+            await newRoom.localParticipant.publishTrack(webcamMedia.getAudioTracks()[0]);
 
-            console.log("📡 Publishing video track...");
-            await newRoom.localParticipant.publishTrack(videoTrack);
+            // Handle remote participants (viewers)
+            newRoom.on('participantConnected', (participant) => {
+                console.log('Viewer connected:', participant.identity);
+            });
 
-            if (audioTrack) {
-                console.log("🔊 Publishing audio track...");
-                await newRoom.localParticipant.publishTrack(audioTrack);
-            } else {
-                console.warn("⚠️ No audio track selected, continuing with video only.");
-            }
-
-            console.log("✅ Streaming started.");
             setRoom(newRoom);
             setIsStreaming(true);
-            setStreamError("");
         } catch (err) {
-            setStreamError("Failed to start streaming");
-            console.error("❌ Streaming error:", err);
-            debugger;
+            console.error('Streaming error:', err);
+            setStreamError('Failed to start streaming. Please check permissions.');
+            stopStreaming();
         }
     };
 
     const stopStreaming = async () => {
         if (room) {
-            room.localParticipant.trackPublications.forEach((pub) => pub.track?.stop());
-            await room.disconnect();
+            room.disconnect();
             setRoom(null);
+        }
+        if (screenStream) {
+            screenStream.getTracks().forEach(track => track.stop());
+            setScreenStream(null);
+        }
+        if (webcamStream) {
+            webcamStream.getTracks().forEach(track => track.stop());
+            setWebcamStream(null);
         }
         setIsStreaming(false);
     };
 
-    const watchStream = async () => {
-        if (!liveKitUrl || !game) {
-            setStreamError("LiveKit config or game data missing.");
-            return;
-        }
-
-        try {
-            const token = await generateLiveKitToken(false, game.id, "viewer");
-            const newRoom = new Room();
-            await newRoom.connect(liveKitUrl, token);
-            setRoom(newRoom);
-            setIsWatching(true);
-            setStreamError("");
-        } catch (err) {
-            console.error("Viewer error:", err);
-            setStreamError("Failed to connect to stream.");
-        }
-    };
-
-    const generateWatchLink = () =>
-        game ? `${window.location.origin}/watch/${game.id}` : "";
-
-    useEffect(() => {
-        const fetchLeaderboard = async () => {
-            if (!game?.id) return;
-            setLeaderboardLoading(true);
-            try {
-                const data = await getLeaderboardForGame(game.id);
-                const formattedData = data.map((item: any) => ({
-                    name: item.user.name,
-                    score: item.totalScore,
-                }));
-                setLeaderboard(formattedData);
-            } catch (err) {
-                console.error("Failed to load leaderboard:", err);
-                setLeaderboard([]);
-            } finally {
-                setLeaderboardLoading(false);
-            }
-        };
-        fetchLeaderboard();
-    }, [game?.id]);
-
-    useEffect(() => {
-        const loadGame = async () => {
-            try {
-                if (location.state?.game) {
-                    const validated = validateGameData(location.state.game);
-                    setGame(validated);
-                }
-            } catch (err) {
-                console.error("Game load failed:", err);
-                navigate("/store", { replace: true });
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadGame();
-    }, [location.state, navigate]);
-
-    const saveScore = async () => {
-        if (!game || currentScore <= 0) return true;
-        setIsSaving(true);
-        try {
-            await saveGameScore(game.id, currentScore);
-            return true;
-        } catch (err) {
-            console.error("Save score failed:", err);
-            return false;
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    const handleQuitGame = async () => {
-        const shouldQuit = currentScore <= 0 || (await saveScore());
-        if (shouldQuit) {
-            setGameStarted(false);
-            setCurrentScore(0);
-            setSessionKey(Date.now());
-        }
-    };
-
-    const confirmExit = async () => {
-        const shouldExit = currentScore <= 0 || (await saveScore());
-        if (shouldExit) {
-            navigate("/store");
-            setShowExitConfirm(false);
-        }
-    };
-
-    const handleNavigationAttempt = async () => {
-        if (gameStarted && currentScore > 0) {
-            setShowExitConfirm(true);
-            return false;
-        }
-        return true;
-    };
-
-    useEffect(() => {
-        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-            if (gameStarted && currentScore > 0) {
-                e.preventDefault();
-                e.returnValue = "";
-                return "";
-            }
-        };
-        window.addEventListener("beforeunload", handleBeforeUnload);
-        return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-    }, [gameStarted, currentScore]);
-
-    useEffect(() => {
-        if (navigationType === "POP" && gameStarted && currentScore > 0) {
-            setShowExitConfirm(true);
-            navigate(location.pathname, { replace: true });
-        }
-    }, [navigationType]);
-
-    if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
-                Loading game...
-            </div>
+    const copyWatchLink = () => {
+        navigator.clipboard.writeText(
+            `${window.location.origin}/watch/${gameId}`
         );
-    }
+    };
+
+    const handleExit = async () => {
+        await stopStreaming();
+        navigate('/store');
+    };
 
     return (
-        <div className="min-h-screen flex bg-gray-900 relative">
-            <div className="h-full fixed">
-                <Sidebar activeItem="store" />
-            </div>
+        <div className="min-h-screen flex bg-gray-900">
+            <Sidebar activeItem="store" />
 
-            <div className="ml-80 flex-1 p-8">
+            <div className="flex-1 p-8 ml-72">
                 <div className="flex justify-between items-center mb-6">
-                    <Button variant="ghost" onClick={async () => {
-                        const canLeave = await handleNavigationAttempt();
-                        if (canLeave) navigate(-1);
-                    }}>
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to Store
-                    </Button>
-
                     <div className="flex gap-4">
-                        <Button
-                            variant="outline"
-                            onClick={isStreaming ? stopStreaming : startStreaming}
-                            disabled={!game || isWatching}
-                        >
-                            {isStreaming ? "Stop Streaming" : "Go Live"}
-                        </Button>
-                        <Button
-                            variant="outline"
-                            onClick={watchStream}
-                            disabled={!game || isStreaming}
-                        >
-                            Watch Stream
-                        </Button>
+                        {isStreaming ? (
+                            <Button onClick={stopStreaming} variant="destructive">
+                                <ScreenShareOff className="mr-2" />
+                                Stop Streaming
+                            </Button>
+                        ) : (
+                            <Button onClick={startStreaming}>
+                                <ScreenShare className="mr-2" />
+                                Go Live
+                            </Button>
+                        )}
+
                         {isStreaming && (
-                            <Button
-                                variant="outline"
-                                onClick={() =>
-                                    navigator.clipboard.writeText(generateWatchLink())
-                                }
-                            >
+                            <Button onClick={copyWatchLink}>
+                                <Copy className="mr-2" />
                                 Copy Watch Link
                             </Button>
                         )}
                     </div>
                 </div>
 
+                {streamError && (
+                    <div className="text-red-500 mb-4 p-3 bg-red-900 rounded">
+                        {streamError}
+                    </div>
+                )}
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
+                    {/* Screen Share Preview */}
+                    {screenStream && (
+                        <div className="relative">
+                            <video
+                                ref={(el) => {
+                                    if (el) el.srcObject = screenStream;
+                                }}
+                                autoPlay
+                                muted
+                                className="w-full h-auto rounded-lg shadow-xl border-2 border-blue-400"
+                            />
+                            <div className="absolute bottom-2 left-2 bg-blue-600 text-xs px-2 py-1 rounded">
+                                Screen Share
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Webcam Preview */}
+                    {webcamStream && (
+                        <div className="relative">
+                            <video
+                                ref={(el) => {
+                                    if (el) el.srcObject = webcamStream;
+                                }}
+                                autoPlay
+                                muted
+                                className="w-full h-auto rounded-lg shadow-xl border-2 border-green-400"
+                            />
+                            <div className="absolute bottom-2 left-2 bg-green-600 text-xs px-2 py-1 rounded">
+                                Webcam
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                <ErrorBoundary fallback={<div className="text-red-500">Something went wrong. Please try again later.</div>}>
+                <div className="aspect-video bg-black rounded-xl overflow-hidden relative">
+                    {game?.hostedUrl && (
+                        <>
+                            <iframe
+                                src={game.hostedUrl}
+                                className="w-full h-full"
+                                title="Game Playground"
+                                allow="autoplay; fullscreen"
+                            />
+                            {!gameStarted && (
+                                <div
+                                    className="absolute inset-0"
+                                    onClick={() => {
+                                        console.log("Overlay clicked");
+                                        setGameStarted(true);
+                                    }}
+                                ></div>
+                            )}
+                        </>
+                    )}
+                </div>
+
+                    <PlaygroundBottomAction
+                        gameStarted={gameStarted}
+                        gameId={gameId!}
+                        currentScore={currentScore}
+                        onScoreUpdate={setCurrentScore}
+                        onExit={async () => {
+                            setShowDialog(true);
+                            navigate('/store');
+                        }}
+                        showDialog={showDialog}
+                        setShowDialog={setShowDialog}                   />
+
+                    <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h2 className="text-xl font-bold mb-4">Game Details</h2>
+                            <div className="space-y-2">
+                                <p><strong>Name:</strong> {game?.name}</p>
+                                <p><strong>Description:</strong> {game?.description}</p>
+                                <p><strong>Rules:</strong> {game?.rules}</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h2 className="text-xl font-bold mb-4">Leaderboard</h2>
+                            <div className="space-y-2">
+                                {leaderboard.map((entry, index) => (
+                                    <div key={index} className="flex justify-between">
+                                        <span>{entry.name}</span>
+                                        <span>{entry.score}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </ErrorBoundary>
+
+                {/* Exit Confirmation Dialog */}
                 <Dialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
                     <DialogContent>
                         <DialogHeader>
                             <DialogTitle>Confirm Exit</DialogTitle>
                         </DialogHeader>
                         <p className="text-gray-300">
-                            {currentScore > 0
-                                ? `Your current score is ${currentScore}. Are you sure you want to quit?`
-                                : "Are you sure you want to exit the game?"}
+                            Are you sure you want to stop streaming and exit the game?
                         </p>
                         <DialogFooter>
-                            <Button onClick={() => setShowExitConfirm(false)} variant="ghost">
+                            <Button variant="outline" onClick={() => setShowExitConfirm(false)}>
                                 Cancel
                             </Button>
-                            <Button onClick={confirmExit}>Confirm</Button>
+                            <Button variant="destructive" onClick={handleExit}>
+                                Confirm Exit
+                            </Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
-
-                <ErrorBoundary fallback={<div>Something went wrong.</div>}>
-                    <div className="aspect-video relative">
-                        {(isStreaming || isWatching) ? (
-                            <>
-                                <video
-                                    id="stream-video"
-                                    className="w-full aspect-video pointer-events-none"
-                                    autoPlay
-                                    muted={isStreaming} // Muted if streaming, otherwise, let viewers hear
-                                    playsInline
-                                    onLoadedData={() => {
-                                        debugger; // Pause when the video is loaded
-                                        console.log("Video element loaded and ready for playback.");
-                                    }}
-                                />
-
-                                {streamError && <div className="text-red-500 p-4">{streamError}</div>}
-                            </>
-                        ) : (
-                            <PlayGround
-                                key={sessionKey}
-                                url={game.hostedUrl}
-                                onFirstInteraction={() => setGameStarted(true)}
-                            />
-                        )}
-
-                        <PlaygroundBottomAction
-                            gameStarted={gameStarted}
-                            gameId={game.id}
-                            currentScore={currentScore}
-                            onScoreUpdate={setCurrentScore}
-                            onExit={handleQuitGame}
-                            showDialog={exitDialogOpen}
-                            setShowDialog={setExitDialogOpen}
-                        />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-[3fr_1fr] gap-6">
-                        <div className="space-y-4">
-                            <div className="text-xl font-semibold text-white">Game Description</div>
-                            <div className="text-gray-300">{game?.description || "No description available."}</div>
-                            <div className="text-xl font-semibold text-white">Game Rules</div>
-                            <div className="text-gray-300">{game?.rules || "No rules available."}</div>
-                        </div>
-                        <div className="space-y-4">
-                            <div className="text-xl font-semibold text-white">Leaderboard</div>
-                            {leaderboardLoading ? (
-                                <div className="text-gray-400">Loading leaderboard...</div>
-                            ) : (
-                                <div className="space-y-2">
-                                    {leaderboard.map((entry) => (
-                                        <div key={entry.name} className="flex justify-between">
-                                            <div className="text-white">{entry.name}</div>
-                                            <div className="text-white">{entry.score}</div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </ErrorBoundary>
             </div>
         </div>
     );

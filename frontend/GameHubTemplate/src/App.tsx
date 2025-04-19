@@ -40,7 +40,7 @@ function App() {
               <Route path="/store" element={<Store/>}/>
               <Route path="/rewards" element={<DailyRewards/>}/>
               <Route path="/profile" element={<Profile/>}/>
-              <Route path="/playGame" element={<PlayGame/>}/>
+              <Route path="/playGame/:gameId" element={<PlayGame />} />
               <Route path="/watch/:gameId" element={<WatchStream/>}/>
               {/*<Route path="/chat" element={<Chat/>}/>*/}
 

@@ -48,8 +48,12 @@ export default function Store() {
         const loadGames = async () => {
             try {
                 const data = await fetchAllGames();
-                setGames(data);
-            setError("");
+                // Filter only approved and active games
+                const filteredGames = data.filter(game =>
+                    game.isApproved && game.active && game.hostedUrl
+                );
+                setGames(filteredGames);
+                setError("");
             } catch (err) {
                 setError(err instanceof Error ? err.message : "Failed to load games");
             } finally {
@@ -64,38 +68,51 @@ export default function Store() {
     ).filter(Boolean) as string[];
 
     const handlePlayClick = (game: Games) => {
-        navigate("/playGame", { state: { game } });
+        navigate(`/playGame/${game.id}`);
     };
 
-    const GameCard = ({ game }: { game: Games }) => (
-        <Card className="bg-gray-800 text-white border-gray-700 hover:border-[#FFB800] transition-colors">
-            <div className="aspect-video relative overflow-hidden">
-                <img
-                    src={game.image || '/fallback-game.png'}
-                    alt={game.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/fallback-game.png';
-                    }}
-                />
-            </div>
-            <CardHeader>
-                <CardTitle className="text-xl">{game.name}</CardTitle>
-                <CardDescription className="text-gray-400 line-clamp-3">
-                    {game.description || 'No description available'}
-                </CardDescription>
-            </CardHeader>
-            <CardFooter className="flex justify-between items-center">
-                {/*<span className="text-[#FFB800] font-bold">{game.price || 'Free'}</span>*/}
-                <Button
-                    className="bg-[#FFB800] hover:bg-[#FFB800]/90 text-black"
-                    onClick={() => handlePlayClick(game)}
-                >
-                    <FontAwesomeIcon icon={faPlay} />&nbsp;&nbsp;Play Now
-                </Button>
-            </CardFooter>
-        </Card>
-    );
+    const GameCard = ({ game }: { game: Games }) => {
+        const [imgError, setImgError] = useState(false);
+
+        return (
+            <Card className="bg-gray-800 text-white border-gray-700 hover:border-[#FFB800] transition-colors">
+                <div className="aspect-video relative overflow-hidden">
+                    {imgError ? (
+                        <div className="w-full h-full bg-gray-700 flex items-center justify-center">
+                            <span className="text-sm">Image not available</span>
+                        </div>
+                    ) : (
+                        <img
+                            src={game.image || '/fallback-game.png'}
+                            alt={game.name}
+                            className="w-full h-full object-cover"
+                            onError={() => setImgError(true)}
+                        />
+                    )}
+                </div>
+                <CardHeader>
+                    <CardTitle className="text-xl">{game.name}</CardTitle>
+                    <CardDescription className="text-gray-400 line-clamp-3">
+                        {game.description || 'No description available'}
+                    </CardDescription>
+                </CardHeader>
+                <CardFooter className="flex justify-between items-center">
+                    {/*add price too*/}
+                    <div className="text-lg font-semibold text-yellow-400">
+                        {game.price ? `$${game.price}` : 'Free'}
+                    </div>
+                    <Button
+                        className="bg-[#FFB800] hover:bg-[#FFB800]/90 text-black"
+                        onClick={() => handlePlayClick(game)}
+                        disabled={!game.hostedUrl}
+                    >
+                        <FontAwesomeIcon icon={faPlay} />&nbsp;&nbsp;
+                        {game.hostedUrl ? 'Play Now' : 'Coming Soon'}
+                    </Button>
+                </CardFooter>
+            </Card>
+        );
+    };
 
     return (
         <ErrorBoundary fallback={<div className="text-red-500 p-4">Store component failed to load</div>}>

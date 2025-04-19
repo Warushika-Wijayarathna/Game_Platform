@@ -80,6 +80,7 @@ export default function PlaygroundBottomAction({
 
     const handleExit = async () => {
         setIsSaving(true);
+        await saveGameScore(gameId, displayScore);
         await onExit();
         setIsSaving(false);
     };
@@ -98,7 +99,10 @@ export default function PlaygroundBottomAction({
                         <Button
                             variant="destructive"
                             className="hover:scale-105 transition-transform"
-                            onClick={() => setShowDialog(true)}
+                            onClick={() => {
+                                console.log("Opening dialog...");
+                                setShowDialog(true);
+                            }}
                         >
                             Exit Game
                         </Button>

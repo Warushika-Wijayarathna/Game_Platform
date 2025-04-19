@@ -170,4 +170,11 @@ public class GameServiceImpl implements GameService {
         return modelMapper.map(game, GameDTO.class);
     }
 
+    @Override
+    public GameDTO getGameById(Long id) {
+        Game game = gameRepository.findById(String.valueOf(id))
+                .orElseThrow(() -> new RuntimeException("Game not found"));
+        return modelMapper.map(game, GameDTO.class);
+    }
+
 }

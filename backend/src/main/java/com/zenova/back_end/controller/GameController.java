@@ -92,7 +92,16 @@ public class GameController {
 
         return ResponseEntity.ok(new ResponseDTO(VarList.OK, "Game Uploaded", gameService.uploadGame(gameDTO, userDTO)));
 
+    }
 
-
+    @GetMapping("/{id}")
+    public ResponseEntity<GameDTO> getGameById(@PathVariable Long id) {
+        try {
+            GameDTO gameDTO = gameService.getGameById(id);
+            return ResponseEntity.ok(gameDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(null);
+        }
     }
 }
