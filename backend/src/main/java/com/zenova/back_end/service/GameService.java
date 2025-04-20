@@ -16,9 +16,9 @@ public interface GameService {
 
     List<GameDTO> getAllActiveGames();
 
-    Object purchaseGame(String token, Long id);
-
     Object uploadGame(GameDTO gameDTO, UserDTO userDTO);
 
     GameDTO getGameById(Long id);
+
+    List<GameDTO> getGamesUploadedByUser(String email);
 }

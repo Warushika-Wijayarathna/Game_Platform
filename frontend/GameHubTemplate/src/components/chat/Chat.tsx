@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import {Client} from "@stomp/stompjs";
+import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
-
 
 interface ChatMessage {
     sender: string;
@@ -72,43 +71,80 @@ const Chat: React.FC = () => {
     };
 
     if (!username) {
-        username = "user"
+        username = "user";
     }
 
     return (
-        <div className="chat-container">
-            <div className="chat-header">
-                <h2>Chat Room</h2>
-                <div className="connection-status">
-                    <span className={`status-dot ${isConnected ? 'connected' : 'disconnected'}`} />
+        <div style={{ maxWidth: '500px', margin: '0 auto', padding: '1rem', fontFamily: 'Arial, sans-serif', border: '1px solid #ccc', borderRadius: '8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h2 style={{ margin: 0 }}>Chat Room</h2>
+                <div style={{ display: 'flex', alignItems: 'center', fontSize: '0.9rem' }}>
+                    <span style={{
+                        width: '10px',
+                        height: '10px',
+                        borderRadius: '50%',
+                        backgroundColor: isConnected ? 'green' : 'red',
+                        display: 'inline-block',
+                        marginRight: '5px'
+                    }} />
                     {isConnected ? 'Connected' : 'Connecting...'}
                 </div>
             </div>
 
-            <div className="messages-container">
+            <div style={{ height: '300px', overflowY: 'auto', border: '1px solid #ddd', borderRadius: '4px', padding: '0.5rem', marginBottom: '1rem' }}>
                 {messages.map((msg, index) => (
-                    <div key={index} className={`message ${msg.sender === username ? 'own-message' : ''}`}>
-                        <div className="message-header">
-                            <span className="sender">{msg.sender}</span>
-                            <span className="timestamp">
+                    <div key={index} style={{
+                        marginBottom: '0.75rem',
+                        textAlign: msg.sender === username ? 'right' : 'left'
+                    }}>
+                        <div style={{ fontSize: '0.85rem', fontWeight: 'bold' }}>
+                            {msg.sender} <span style={{ fontWeight: 'normal', color: '#666', fontSize: '0.75rem' }}>
                                 {new Date(msg.timestamp).toLocaleTimeString()}
                             </span>
                         </div>
-                        <div className="message-content">{msg.content}</div>
+                        <div style={{
+                            display: 'inline-block',
+                            backgroundColor: msg.sender === username ? '#dcf8c6' : '#f1f0f0',
+                            padding: '0.5rem',
+                            borderRadius: '10px',
+                            maxWidth: '80%',
+                            wordWrap: 'break-word'
+                        }}>
+                            {msg.content}
+                        </div>
                     </div>
                 ))}
                 <div ref={messagesEndRef} />
             </div>
 
-            <form onSubmit={handleSubmit} className="message-form">
+            <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '0.5rem' }}>
                 <input
                     type="text"
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     placeholder="Type a message..."
                     disabled={!isConnected}
+                    style={{
+                        flex: 1,
+                        padding: '0.5rem',
+                        borderRadius: '4px',
+                        border: '1px solid #ccc',
+                        fontSize: '1rem'
+                    }}
                 />
-                <button type="submit" disabled={!isConnected}>
+                <button
+                    type="submit"
+                    disabled={!isConnected}
+                    style={{
+                        padding: '0.5rem 1rem',
+                        borderRadius: '4px',
+                        border: 'none',
+                        backgroundColor: isConnected ? '#4CAF50' : '#ccc',
+                        color: '#fff',
+                        fontWeight: 'bold',
+                        cursor: isConnected ? 'pointer' : 'not-allowed'
+                    }}
+                >
                     {isConnected ? 'Send' : 'Connecting...'}
                 </button>
             </form>

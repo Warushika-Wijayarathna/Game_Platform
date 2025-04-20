@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
     public UserDTO loadUserDetailsByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(username);
-        return modelMapper.map(user,UserDTO.class);
+        return user != null ? modelMapper.map(user, UserDTO.class) : null;
     }
 
     private Set<SimpleGrantedAuthority> getAuthority(User user) {

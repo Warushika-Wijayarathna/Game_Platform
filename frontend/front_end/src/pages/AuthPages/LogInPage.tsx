@@ -1,6 +1,7 @@
 import { FormEvent, useState } from "react";
 import { login } from "../../api/auth.tsx";
 import { Link } from "react-router-dom";
+import {GoogleSignBtn} from "../../components/button/GoogleSignBtn.tsx";
 
 
 const LoginForm: React.FC = () => {
@@ -112,15 +113,7 @@ const LoginForm: React.FC = () => {
                     {/* Social Media Login */}
                     <hr className="my-6 border-gray-300" />
                     <div className="space-x-6 flex justify-center">
-                        <button type="button" className="border-none outline-none">
-                            <img src="https://img.icons8.com/color/30/google-logo.png" alt="Google Sign Up" />
-                        </button>
-                        <button type="button" className="border-none outline-none">
-                            <img src="https://img.icons8.com/ios-filled/30/facebook.png" alt="Facebook Sign Up" />
-                        </button>
-                        <button type="button" className="border-none outline-none">
-                            <img src="https://img.icons8.com/color/30/twitter--v1.png" alt="Twitter Sign Up" />
-                        </button>
+                        <GoogleSignBtn />
                     </div>
                 </form>
             </div>

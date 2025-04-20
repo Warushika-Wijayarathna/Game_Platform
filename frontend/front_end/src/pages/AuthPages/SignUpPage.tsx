@@ -31,11 +31,6 @@ const SignUpForm: React.FC = () => {
         }
     };
 
-    const handleFacebookLogin = () => {
-        // Replace with your backend OAuth URL
-        window.location.href = 'http://localhost:8080/oauth2/authorization/facebook';
-    };
-
     return (
         <div className="flex justify-center items-center bg-gray-100 font-[sans-serif] h-full md:min-h-screen p-4">
             <div className="grid justify-center max-w-md mx-auto">
@@ -95,23 +90,6 @@ const SignUpForm: React.FC = () => {
 
                     <div className="space-x-6 flex justify-center">
                         <GoogleSignBtn/>
-
-                        <button
-                            type="button"
-                            onClick={handleFacebookLogin}
-                            className="border-none outline-none"
-                        >
-                            <img
-                                src="https://img.icons8.com/ios-filled/30/facebook.png"
-                                alt="Facebook Sign Up"
-                            />
-                        </button>
-                        <button type="button" className="border-none outline-none">
-                            <img
-                                src="https://img.icons8.com/color/30/twitter--v1.png"
-                                alt="Twitter Sign Up"
-                            />
-                        </button>
                     </div>
                 </form>
             </div>

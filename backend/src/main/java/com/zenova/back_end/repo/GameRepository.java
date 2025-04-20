@@ -14,4 +14,6 @@ public interface GameRepository extends JpaRepository<Game, String> {
     List<Game> findAll();
 
     List<Game> findAllByActiveTrue();
+
+    Optional<Object> findByUploadedByEmail(String email);
 }

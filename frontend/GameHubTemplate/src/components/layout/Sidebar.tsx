@@ -9,6 +9,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip.tsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {faCircleUser} from "@fortawesome/free-solid-svg-icons";
 
 interface SidebarProps {
   activeItem?: string;
@@ -45,7 +47,7 @@ const Sidebar = ({ activeItem = "home", onMenuClick }: SidebarProps) => {
     },
     {
       id: "profile",
-      icon: <Gift className="w-5 h-5" />,
+      icon: <FontAwesomeIcon icon={faCircleUser} />,
       label: "Profile",
     },
   ];

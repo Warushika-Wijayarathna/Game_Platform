@@ -25,8 +25,6 @@ export default function Home() {
         <div className="col-span-12">
           <StatisticsChart />
         </div>
-
-
       </div>
     </>
   );

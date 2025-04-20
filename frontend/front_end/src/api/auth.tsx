@@ -9,7 +9,7 @@ interface AuthResponse {
     }
 }
 
-const sendTokenToOtherDomains = (token: string) => {
+export const sendTokenToOtherDomains = (token: string) => {
     const targetOrigin = 'http://localhost:5174';
 
     return new Promise<void>((resolve) => {

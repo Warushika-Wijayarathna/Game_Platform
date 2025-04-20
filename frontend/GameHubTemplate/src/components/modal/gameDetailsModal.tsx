@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FiX } from "react-icons/fi";
 import GameDetailsTable from "@/components/table/gameDetailsTable";
+import { getUploadedGamesByUser } from "@/api/games";
+import { Games } from "@/api/games";
 
 interface GameDetailsModalProps {
     isOpen: boolean;
@@ -9,6 +11,28 @@ interface GameDetailsModalProps {
 }
 
 const GameDetailsModal: React.FC<GameDetailsModalProps> = ({ isOpen, onClose }) => {
+    const [uploadedGames, setUploadedGames] = useState<Games[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchGames = async () => {
+            try {
+                setLoading(true);
+                const games = await getUploadedGamesByUser();
+                setUploadedGames(games);
+            } catch (err) {
+                setError("Failed to load uploaded games. Please try again later.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (isOpen) {
+            fetchGames();
+        }
+    }, [isOpen]);
+
     if (!isOpen) return null;
 
     return (
@@ -25,7 +49,13 @@ const GameDetailsModal: React.FC<GameDetailsModalProps> = ({ isOpen, onClose }) 
                     </button>
                 </div>
 
-                <GameDetailsTable />
+                {loading ? (
+                    <p>Loading games...</p>
+                ) : error ? (
+                    <p className="text-red-500">{error}</p>
+                ) : (
+                    <GameDetailsTable games={uploadedGames} />
+                )}
             </motion.div>
         </div>
     );

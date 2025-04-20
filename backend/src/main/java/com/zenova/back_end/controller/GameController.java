@@ -69,17 +69,11 @@ public class GameController {
         return ResponseEntity.ok(gameService.getAllActiveGames());
     }
 
-    @PostMapping("/purchase")
-    public ResponseEntity<ResponseDTO> purchaseGame(@RequestHeader("Authorization") String token, @RequestParam Long id) {
-        return ResponseEntity.ok(new ResponseDTO(VarList.OK, "Game Purchased", gameService.purchaseGame(token, id)));
-    }
-
     @PostMapping("/upload")
     public ResponseEntity<ResponseDTO> uploadGame(@RequestHeader("Authorization") String token, @RequestBody GameDTO gameDTO) {
         String tokens = token.replace("Bearer ", "");
         System.out.println("Parsed Token: " + tokens);
 
-        // receive data
         System.out.println("=============================================");
         System.out.println("Received data: " + gameDTO);
 
@@ -102,6 +96,29 @@ public class GameController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(null);
+        }
+    }
+
+
+    @GetMapping("/user/uploaded")
+    public ResponseEntity<?> getUploadedGamesByUser(@RequestHeader("Authorization") String authHeader) {
+        try {
+            // Extract the token and get the user's email
+            String token = authHeader.replace("Bearer ", "");
+            String email = jwtUtil.getUsernameFromToken(token);
+
+            if (email == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("Invalid token");
+            }
+
+            // Fetch games uploaded by the user
+            List<GameDTO> uploadedGames = gameService.getGamesUploadedByUser(email);
+
+            return ResponseEntity.ok(uploadedGames);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to fetch uploaded games: " + e.getMessage());
         }
     }
 }

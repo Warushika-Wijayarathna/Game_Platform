@@ -1,5 +1,6 @@
 import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
+import {sendTokenToOtherDomains} from "../../api/auth.tsx";
 
 export function GoogleSignBtn() {
     const login = useGoogleLogin({
@@ -34,12 +35,10 @@ export function GoogleSignBtn() {
                     // Optionally, you can also store user info in local storage
                     localStorage.setItem("token", JSON.stringify(res.data.data.token));
 
+                    await sendTokenToOtherDomains(localStorage.getItem("token") || "");
+
                     // Redirect to another page after successful login
-                    if(res.data.data.role === "admin") {
-                        window.location.href = "/admin";
-                    }else {
-                        window.location.href = "/";
-                    }
+                    window.location.href = 'http://localhost:5174/';
 
                 }
             } catch (error) {

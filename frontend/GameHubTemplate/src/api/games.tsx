@@ -94,3 +94,26 @@ export const getGameById = async (gameId: string): Promise<Games> => {
         throw new Error('Failed to load game details');
     }
 };
+
+export const getUploadedGamesByUser = async (): Promise<Games[]> => {
+    try {
+        const response = await axios.get(`${BASE_URL}/user/uploaded`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            },
+            timeout: API_TIMEOUT
+        });
+
+        if (!Array.isArray(response.data)) {
+            throw new Error('Invalid API response format');
+        }
+
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            const message = error.response?.data?.message || 'Network Error';
+            throw new Error(`Failed to fetch uploaded games: ${message}`);
+        }
+        throw new Error('Failed to load uploaded games. Please try again later.');
+    }
+}

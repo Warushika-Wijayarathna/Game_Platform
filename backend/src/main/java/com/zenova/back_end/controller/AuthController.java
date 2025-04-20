@@ -75,13 +75,12 @@ public class  AuthController {
         String email = request.get("email");
         String name = request.get("name");
 
-
         System.out.println("Google login request received: " + email + ", " + name);
 
         // Check if the user exists in the database
-        UserDTO existingUser = userService.getUserByEmail(email);
+        UserDTO existingUser = userService.loadUserDetailsByUsername(email);
 
-        Role role = email.endsWith("@zplay.com") ? Role.ADMIN : Role.DEVELOPER;
+        Role role = email.endsWith("@zplay.com") ? Role.ADMIN : Role.USER;
 
         // If user doesn't exist, create a new user
         if (existingUser == null) {
@@ -100,24 +99,24 @@ public class  AuthController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body(new ResponseDTO(VarList.Internal_Server_Error, "Failed to register Google user", null));
             }
+            existingUser = newUserDTO; // Assign the newly created user
         }
 
-        // Create UserDTO for token generation
-        UserDTO userDTO = new UserDTO();
-        userDTO.setEmail(email);
-        userDTO.setName(name);
-        userDTO.setRole(role);
+        // Generate JWT using the loaded or newly created user
+        String token = jwtUtil.generateToken(existingUser);
 
-        // Generate JWT
-        String jwt = jwtUtil.generateToken(userDTO);
+        if (token == null || token.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new ResponseDTO(VarList.Conflict, "Authorization Failure! Please Try Again", null));
+        }
 
         // Create auth response with token
         AuthDTO authDTO = new AuthDTO();
-        authDTO.setEmail(email);
-        authDTO.setToken(jwt);
+        authDTO.setEmail(existingUser.getEmail());
+        authDTO.setToken(token);
 
         System.out.println("Google login successful: " + email);
-        System.out.println("Generated token: " + jwt);
+        System.out.println("Generated token: " + token);
 
         ResponseDTO responseDTO = new ResponseDTO();
         responseDTO.setCode(VarList.OK);
