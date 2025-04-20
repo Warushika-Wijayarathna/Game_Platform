@@ -11,6 +11,10 @@ import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import "firebase/compat/storage";
 import { storage } from "@/config/firebase-config";
 import ChatUi from "@/components/chat/chatUi.tsx";
+import { useNavigate } from "react-router-dom";
+import {navigate} from "next/dist/client/components/segment-cache";
+import GameDetailsModal from "@/components/modal/gameDetailsModal.tsx";
+
 
 const styles = ["pixel", "bottts", "avataaars", "micah", "adventurer"];
 const skinTones = ["#ffdbac", "#f1c27d", "#e0ac69", "#c68642", "#8d5524"];
@@ -47,6 +51,7 @@ const GameUploadModal = ({ onClose }) => {
     });
 
     const [categories, setCategories] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const loadCategories = async () => {
@@ -296,6 +301,8 @@ export default function Profile() {
     const [accessory, setAccessory] = useState("none");
     const [showGameModal, setShowGameModal] = useState(false);
     const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [showGdModal, setShowGdModal] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -356,6 +363,12 @@ export default function Profile() {
         };
         return names[hex] || hex;
     };
+
+    const useNavigate1 = useNavigate();
+
+    function handleNavigate() {
+        useNavigate1("/userGameDetails");
+    }
 
     return (
         <div className="relative w-full max-w-6xl mx-auto p-6 text-white">
@@ -534,8 +547,21 @@ export default function Profile() {
                     </div>
                 </div>
             </div>
+            <button
+                className="bg-amber-400 w-5 absolute right-2.5 bottom-2.5"
+                onClick={() => setShowGdModal(true)}
+            >
 
+                G <br/>
+                A <br/>
+                M <br/>
+                E <br/>
+            </button>
 
+            <GameDetailsModal
+                isOpen={showGdModal}
+                onClose={() => setShowGdModal(false)}
+            />
         </div>
     );
 }

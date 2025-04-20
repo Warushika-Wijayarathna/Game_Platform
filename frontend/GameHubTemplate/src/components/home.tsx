@@ -13,19 +13,11 @@ import { Apple, PlayCircle, Gamepad2 } from "lucide-react";
 import DailyRewards from "./rewards/DailyRewards.tsx";
 import Profile from "@/components/profile.tsx";
 
-interface NewsItem {
-  id: string;
-  title: string;
-  date: string;
-  category: string;
-  thumbnail: string;
-}
 
-interface EventItem {
+interface TopPlayers {
   id: string;
-  title: string;
-  date: string;
-  type: string;
+  name: string;
+  score: number;
 }
 
 interface StoreItem {
@@ -34,36 +26,28 @@ interface StoreItem {
   image: string;
 }
 
-const defaultNews: NewsItem[] = [
-  {
-    id: "1",
-    title: "New Season Launch",
-    date: "2024-02-20",
-    category: "UPDATES",
-    thumbnail: "https://images.unsplash.com/photo-1542751371-adc38448a05e",
-  },
-  {
-    id: "2",
-    title: "Weekend Tournament",
-    date: "2024-02-22",
-    category: "EVENTS",
-    thumbnail: "https://images.unsplash.com/photo-1511512578047-dfb367046420",
-  },
-];
 
-const defaultEvents: EventItem[] = [
+
+const topPlayers: TopPlayers[] = [
   {
     id: "1",
-    title: "Spring Championship",
-    date: "2024-03-15",
-    type: "Tournament",
+    name : "Player 1",
+    score: 1000,
+
   },
-  {
-    id: "2",
-    title: "Double XP Weekend",
-    date: "2024-03-01",
-    type: "Special Event",
-  },
+
+    {
+        id: "2",
+        name : "Player 2",
+        score: 900,
+
+    },
+    {
+        id: "3",
+        name : "Player 3",
+        score: 800,
+
+    },
 ];
 
 const defaultStoreItems: StoreItem[] = [
@@ -171,64 +155,17 @@ export default function Home() {
                         ))}
                       </div>
                     </section>
-
-                    {/* News Feed */}
-                    <section>
-                      <Tabs defaultValue="ALL" className="w-full">
-                        <TabsList className="bg-gray-800 w-full justify-start">
-                          {["ALL", "UPDATES", "EVENTS", "OTHER"].map((tab) => (
-                              <TabsTrigger
-                                  key={tab}
-                                  value={tab}
-                                  className="text-white data-[state=active]:bg-gray-700"
-                              >
-                                {tab}
-                              </TabsTrigger>
-                          ))}
-                        </TabsList>
-                        {["ALL", "UPDATES", "EVENTS", "OTHER"].map((tab) => (
-                            <TabsContent key={tab} value={tab} className="mt-6">
-                              <div className="grid gap-6">
-                                {defaultNews
-                                    .filter((news) => tab === "ALL" || news.category === tab)
-                                    .map((news) => (
-                                        <Card key={news.id} className="bg-gray-800 text-white border-gray-700">
-                                          <CardHeader>
-                                            <div className="flex justify-between items-start">
-                                              <div>
-                                                <CardTitle>{news.title}</CardTitle>
-                                                <CardDescription className="text-gray-400">
-                                                  {news.date}
-                                                </CardDescription>
-                                              </div>
-                                              <span className="text-sm text-[#FFB800]">{news.category}</span>
-                                            </div>
-                                          </CardHeader>
-                                          <CardContent>
-                                            <img
-                                                src={news.thumbnail}
-                                                alt={news.title}
-                                                className="w-full h-48 object-cover rounded-lg"
-                                            />
-                                          </CardContent>
-                                        </Card>
-                                    ))}
-                              </div>
-                            </TabsContent>
-                        ))}
-                      </Tabs>
-                    </section>
                   </div>
 
                   {/* Right Sidebar */}
                   <aside className="space-y-6">
                     <h2 className="text-2xl font-bold text-white">Upcoming Events</h2>
-                    {defaultEvents.map((event) => (
+                    {topPlayers.map((event) => (
                         <Card key={event.id} className="bg-gray-800 text-white border-gray-700">
                           <CardHeader>
-                            <CardTitle className="text-lg">{event.title}</CardTitle>
+                            <CardTitle className="text-lg">{event.name}</CardTitle>
                             <CardDescription className="text-gray-400">
-                              {event.date} • {event.type}
+                              {event.score}⭐
                             </CardDescription>
                           </CardHeader>
                         </Card>

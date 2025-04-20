@@ -12,7 +12,7 @@ interface ChatMessage {
 const Chat: React.FC = () => {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [inputMessage, setInputMessage] = useState('');
-    const [username, setUsername] = useState('');
+    let [username, setUsername] = useState('');
     const [isConnected, setIsConnected] = useState(false);
     const stompClient = useRef<Client | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -72,24 +72,7 @@ const Chat: React.FC = () => {
     };
 
     if (!username) {
-        return (
-            <div className="auth-container">
-                <h2>Choose a Username</h2>
-                <form onSubmit={(e) => {
-                    e.preventDefault();
-                    const formData = new FormData(e.currentTarget);
-                    setUsername(formData.get('username')!.toString().trim());
-                }}>
-                    <input
-                        name="username"
-                        placeholder="Enter username..."
-                        required
-                        minLength={3}
-                    />
-                    <button type="submit">Join Chat</button>
-                </form>
-            </div>
-        );
+        username = "user"
     }
 
     return (

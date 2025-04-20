@@ -9,6 +9,7 @@ import PlayGame from "./components/playGame.tsx";
 import WatchStream from "@/components/WatchStream.tsx";
 import Profile from "./components/profile.tsx";
 import Chat from "@/components/chat/Chat.tsx";
+import GameDetailsTable from "@/components/table/gameDetailsTable.tsx";
 
 function App() {
 

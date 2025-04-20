@@ -1,13 +1,10 @@
 package com.zenova.back_end.controller;
-
-
 import com.zenova.back_end.dto.ChatMessage;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
 import java.time.LocalDateTime;
-
 
 @Controller
 public class ChatController {

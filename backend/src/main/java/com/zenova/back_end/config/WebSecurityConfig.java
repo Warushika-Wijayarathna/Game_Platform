@@ -73,6 +73,7 @@ public class WebSecurityConfig {
                                 "/api/v1/user/login",
                                 "/api/v1/user/**",
                                 "/api/v1/auth/refreshToken",
+                                "/api/v1/auth/google",
                                 "/api/v1/category/add",
                                 "/api/v1/category/**",
                                 "/api/v1/category/all-active",

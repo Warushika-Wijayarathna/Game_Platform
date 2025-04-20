@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { signup } from '../../api/auth';
+import {GoogleSignBtn} from "../../components/button/GoogleSignBtn.tsx";
 
 const SignUpForm: React.FC = () => {
     const [name, setName] = useState<string>('');
@@ -93,12 +94,8 @@ const SignUpForm: React.FC = () => {
                     <hr className="my-6 border-gray-300" />
 
                     <div className="space-x-6 flex justify-center">
-                        <button type="button" className="border-none outline-none">
-                            <img
-                                src="https://img.icons8.com/color/30/google-logo.png"
-                                alt="Google Sign Up"
-                            />
-                        </button>
+                        <GoogleSignBtn/>
+
                         <button
                             type="button"
                             onClick={handleFacebookLogin}

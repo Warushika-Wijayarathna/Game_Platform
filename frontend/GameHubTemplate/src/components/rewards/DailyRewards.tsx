@@ -104,7 +104,7 @@ const DailyReward = () => {
                       opacity: '0.8'
                     }),
                     ...(reward.claimable && {
-                      border: '2px solid #4CAF50'
+                      border: '2px solid #dea814'
                     })
                   }}
               >
@@ -115,7 +115,7 @@ const DailyReward = () => {
                 }}>{reward.dayName}</h3>
 
                 <p style={{
-                  color: '#4CAF50',
+                  color: '#dea814',
                   fontSize: '1.5rem',
                   fontWeight: 'bold',
                   margin: '0 0 1rem'
@@ -146,7 +146,7 @@ const DailyReward = () => {
         <p style={{
           marginTop: '2rem',
           textAlign: 'center',
-          color: '#34495e',
+          color: '#dea814',
           fontSize: '1.125rem'
         }}>
           Claim your rewards every week! Points can be used to unlock exclusive content.
