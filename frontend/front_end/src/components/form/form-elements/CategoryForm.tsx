@@ -29,10 +29,10 @@ import { useState, useEffect } from "react";
         useEffect(() => {
             if (alert) {
                 const timer = setTimeout(() => {
-                    setAlert(null); // Clear the alert after 5 seconds
+                    setAlert(null);
                 }, 5000);
 
-                return () => clearTimeout(timer); // Cleanup the timer on component unmount or alert change
+                return () => clearTimeout(timer);
             }
         }, [alert]);
 
@@ -69,6 +69,7 @@ import { useState, useEffect } from "react";
                 setEditingCategoryId(null);
                 await fetchCategories();
             } catch (error) {
+                console.error("Error saving category:", error);
                 setAlert({ type: "error", message: "Error saving category. Please try again." });
             }
         };
@@ -91,6 +92,7 @@ import { useState, useEffect } from "react";
                     await fetchCategories();
                 } catch (error) {
                     setAlert({ type: "error", message: "Error deactivating category. Please try again." });
+                    console.log("Error deactivating category:", error);
                 } finally {
                     setIsDialogOpen(false);
                     setCategoryToDeactivate(null);
@@ -119,7 +121,12 @@ import { useState, useEffect } from "react";
                                         id="name"
                                         name="name"
                                         value={categoryData.name || ""}
-                                        onChange={handleInputChange}
+                                        onChange={(e) => {
+                                            const regex = /^[a-zA-Z0-9 ]*$/; // Alphanumeric and spaces
+                                            if (regex.test(e.target.value)) {
+                                                handleInputChange(e);
+                                            }
+                                        }}
                                         placeholder="Enter category name"
                                         required
                                     />

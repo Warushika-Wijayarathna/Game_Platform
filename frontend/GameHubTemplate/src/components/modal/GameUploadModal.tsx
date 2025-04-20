@@ -99,7 +99,12 @@ const GameUploadModal = ({ onClose }) => {
                                 type="text"
                                 name="name"
                                 value={gameData.name}
-                                onChange={handleChange}
+                                onChange={(e) => {
+                                    const regex = /^[a-zA-Z0-9 ]*$/; // Alphanumeric and spaces
+                                    if (regex.test(e.target.value)) {
+                                        handleChange(e);
+                                    }
+                                }}
                                 placeholder="Enter game name"
                                 className="w-full p-2 rounded bg-gray-700 border border-gray-600"
                                 required
@@ -156,7 +161,12 @@ const GameUploadModal = ({ onClose }) => {
                                 type="number"
                                 name="price"
                                 value={gameData.price}
-                                onChange={handleChange}
+                                onChange={(e) => {
+                                    const regex = /^[0-9]*$/; // Numeric values only
+                                    if (regex.test(e.target.value)) {
+                                        handleChange(e);
+                                    }
+                                }}
                                 placeholder="Enter game price"
                                 className="w-full p-2 rounded bg-gray-700 border border-gray-600"
                                 min="0"
@@ -171,7 +181,12 @@ const GameUploadModal = ({ onClose }) => {
                                 type="url"
                                 name="url"
                                 value={gameData.url}
-                                onChange={handleChange}
+                                onChange={(e) => {
+                                    const regex = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- ./?%&=]*)?$/; // URL validation
+                                    if (regex.test(e.target.value)) {
+                                        handleChange(e);
+                                    }
+                                }}
                                 placeholder="https://your-game-domain.com"
                                 className="w-full p-2 rounded bg-gray-700 border border-gray-600"
                                 required

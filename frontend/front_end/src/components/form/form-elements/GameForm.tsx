@@ -348,7 +348,12 @@ export default function GameForm() {
                                     id="name"
                                     name="name"
                                     value={gameData.name}
-                                    onChange={handleInputChange}
+                                    onChange={(e) => {
+                                        const regex = /^[a-zA-Z0-9 ]*$/; // Alphanumeric and spaces
+                                        if (regex.test(e.target.value)) {
+                                            handleInputChange(e);
+                                        }
+                                    }}
                                     placeholder="Enter game name"
                                     required
                                 />
@@ -409,7 +414,12 @@ export default function GameForm() {
                                     id="price"
                                     name="price"
                                     value={gameData.price}
-                                    onChange={handleInputChange}
+                                    onChange={(e) => {
+                                        const regex = /^[0-9]*$/; // Numeric values only
+                                        if (regex.test(e.target.value)) {
+                                            handleInputChange(e);
+                                        }
+                                    }}
                                     placeholder="Enter game price"
                                 />
                             </div>
@@ -421,7 +431,12 @@ export default function GameForm() {
                                     id="hostedUrl"
                                     name="hostedUrl"
                                     value={gameData.hostedUrl}
-                                    onChange={handleInputChange}
+                                    onChange={(e) => {
+                                        const regex = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- ./?%&=]*)?$/; // URL validation
+                                        if (regex.test(e.target.value)) {
+                                            handleInputChange(e);
+                                        }
+                                    }}
                                     placeholder="https://your-game-domain.com"
                                     required
                                 />
