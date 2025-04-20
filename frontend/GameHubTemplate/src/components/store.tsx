@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
-import {fetchAllGames, Games, User} from "../api/games";
+import { fetchAllGames, Games, User } from "../api/games";
 import ErrorBoundary from "../components/ErrorBoundary";
 import DailyRewards from "@/components/rewards/DailyRewards.tsx";
 import Chat from "@/components/chat/Chat.tsx";
@@ -18,7 +18,6 @@ export default function Store() {
     const [activeSection, setActiveSection] = useState<"home" | "rewards" | "store" | "profile">(
         "store",
     );
-
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [activeDonorId, setActiveDonorId] = useState<number | null>(null);
 
@@ -33,22 +32,13 @@ export default function Store() {
     };
 
     const handleMenuClick = (menuItem: string) => {
-        if (menuItem === "rewards") {
-            setActiveSection("rewards");
-        } else if (menuItem === "home") {
-            setActiveSection("home");
-        } else if (menuItem === "store") {
-            setActiveSection("store");
-        } else if (menuItem === "profile") {
-            setActiveSection("profile");
-        }
+        setActiveSection(menuItem as "home" | "rewards" | "store" | "profile");
     };
 
     useEffect(() => {
         const loadGames = async () => {
             try {
                 const data = await fetchAllGames();
-                // Filter only approved and active games
                 const filteredGames = data.filter(game =>
                     game.isApproved && game.active && game.hostedUrl
                 );
@@ -68,14 +58,45 @@ export default function Store() {
     ).filter(Boolean) as string[];
 
     const handlePlayClick = (game: Games) => {
+        const isRacing = game.category?.name.toLowerCase() === 'race';
+        const points = parseInt(localStorage.getItem('existingPoints') || '0', 10);
+
+        if (isRacing && points < 250) {
+            alert('You need at least 250 points to play racing games!');
+            return;
+        }
+
         navigate(`/playGame/${game.id}`);
     };
 
     const GameCard = ({ game }: { game: Games }) => {
         const [imgError, setImgError] = useState(false);
+        const [points] = useState(() => {
+            const storedPoints = localStorage.getItem('existingPoints');
+            return parseInt(storedPoints || '0', 10);
+        });
+
+        const isRacingGame = game.category?.name.toLowerCase() === 'race';
+        const canPlayRacing = points >= 250;
+        const isLocked = isRacingGame && !canPlayRacing;
 
         return (
-            <Card className="bg-gray-800 text-white border-gray-700 hover:border-[#FFB800] transition-colors">
+            <Card className="bg-gray-800 text-white border-gray-700 hover:border-[#FFB800] transition-colors relative">
+                {/* Lock overlay */}
+                {isLocked && (
+                    <div className="absolute inset-0 bg-black/80 flex items-center justify-center rounded-lg z-10">
+                        <div className="text-center p-4">
+                            <div className="text-2xl font-bold text-yellow-400 mb-2">
+                                🔒 Locked
+                            </div>
+                            <p className="text-gray-200">
+                                Requires 250 points<br />
+                                Current points: {points}
+                            </p>
+                        </div>
+                    </div>
+                )}
+
                 <div className="aspect-video relative overflow-hidden">
                     {imgError ? (
                         <div className="w-full h-full bg-gray-700 flex items-center justify-center">
@@ -97,17 +118,17 @@ export default function Store() {
                     </CardDescription>
                 </CardHeader>
                 <CardFooter className="flex justify-between items-center">
-                    {/*add price too*/}
                     <div className="text-lg font-semibold text-yellow-400">
                         {game.price ? `$${game.price}` : 'Free'}
                     </div>
                     <Button
-                        className="bg-[#FFB800] hover:bg-[#FFB800]/90 text-black"
+                        className="bg-[#FFB800] hover:bg-[#FFB800]/90 text-black relative"
                         onClick={() => handlePlayClick(game)}
-                        disabled={!game.hostedUrl}
+                        disabled={!game.hostedUrl || isLocked}
                     >
                         <FontAwesomeIcon icon={faPlay} />&nbsp;&nbsp;
-                        {game.hostedUrl ? 'Play Now' : 'Coming Soon'}
+                        {!game.hostedUrl ? 'Coming Soon' :
+                            isLocked ? 'Need 250 Points' : 'Play Now'}
                     </Button>
                 </CardFooter>
             </Card>
@@ -155,12 +176,8 @@ export default function Store() {
                 </button>
 
                 {isChatOpen && (
-                    <Chat
-                        donorId={activeDonorId}
-                        onClose={handleChatClose}
-                    />
+                    <Chat/>
                 )}
-
             </div>
         </ErrorBoundary>
     );

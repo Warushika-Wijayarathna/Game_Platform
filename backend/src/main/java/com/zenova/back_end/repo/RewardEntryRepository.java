@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface RewardEntryRepository extends JpaRepository<RewardEntry, Long> {
@@ -15,4 +16,7 @@ public interface RewardEntryRepository extends JpaRepository<RewardEntry, Long> 
 
     @Query("SELECT re FROM RewardEntry re WHERE re.user.uid = :userId AND re.weekStartDate = :weekStartDate AND re.dayOfWeek = :dayOfWeek")
     RewardEntry findByUserIdAndWeekStartDateAndDayOfWeek(@Param("userId") UUID userId, @Param("weekStartDate") LocalDate weekStartDate, @Param("dayOfWeek") int dayOfWeek);
+
+    @Query("SELECT SUM(r.points) FROM RewardEntry r WHERE r.user.email = :email AND r.claimed = true")
+    Optional<Integer> getTotalPointsByEmail(@Param("email") String email);
 }

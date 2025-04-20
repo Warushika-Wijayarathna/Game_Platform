@@ -155,5 +155,10 @@ public class ScoreServiceImpl implements ScoreService {
 
     }
 
+    @Override
+    public int getTotalPointsByEmail(String email) {
+        return rewardEntryRepository.getTotalPointsByEmail(email).orElse(0);
+    }
+
 
 }

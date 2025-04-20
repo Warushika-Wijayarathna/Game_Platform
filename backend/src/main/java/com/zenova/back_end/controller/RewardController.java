@@ -9,10 +9,13 @@ import com.zenova.back_end.util.JwtUtil;
 import com.zenova.back_end.util.VarList;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/v1/reward")
@@ -55,22 +58,36 @@ public class RewardController {
             @RequestHeader("Authorization") String token,
             @PathVariable int dayOfWeek) {
         try {
-            // Extract the token and get user details
             String tokens = token.replace("Bearer ", "");
             Claims claims = jwtUtil.getAllClaimsFromToken(tokens);
             String email = claims.getSubject();
 
-            // Fetch the user by email
             UserDTO user = userService.getUserByEmail(email);
 
-            // Call the service method to claim the reward
             scoreService.claimReward(user, dayOfWeek);
 
-            // Return success response
             return ResponseEntity.ok(new ResponseDTO(VarList.OK, "Reward claimed successfully", null));
         } catch (RuntimeException e) {
-            // Handle errors and return appropriate response
             return ResponseEntity.status(400).body(new ResponseDTO(VarList.Internal_Server_Error, e.getMessage(), null));
+        }
+    }
+
+    @GetMapping("/totalPoints")
+    public ResponseEntity<Map<String, Integer>> getTotalPoints(@RequestHeader("Authorization") String token) {
+        try {
+            String tokens = token.replace("Bearer ", "");
+            Claims claims = jwtUtil.getAllClaimsFromToken(tokens);
+            String email = claims.getSubject();
+
+            int totalPoints = scoreService.getTotalPointsByEmail(email);
+
+            Map<String, Integer> response = new HashMap<>();
+            response.put("totalPoints", totalPoints);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
         }
     }
 }

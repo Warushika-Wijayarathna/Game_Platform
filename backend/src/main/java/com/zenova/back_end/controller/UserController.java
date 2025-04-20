@@ -17,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -221,6 +222,40 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ResponseDTO(VarList.Internal_Server_Error, e.getMessage(), null));
+        }
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<Map<String, Integer>> getAllUserCount() {
+        try {
+            int userCount = userService.getUserCount();
+            Map<String, Integer> response = new HashMap<>();
+            response.put("count", userCount);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/developer/count")
+    public ResponseEntity<Map<String, Integer>> getAllDeveloperCount() {
+        try {
+            int developerCount = userService.getDeveloperCount();
+            Map<String, Integer> response = new HashMap<>();
+            response.put("count", developerCount);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/topScorers")
+    public ResponseEntity<List<Map<String, Object>>> getTopScorers() {
+        try {
+            List<Map<String, Object>> topScorers = userService.getTopScorers();
+            return ResponseEntity.ok(topScorers);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -149,13 +150,19 @@ public class GameServiceImpl implements GameService {
     @Override
     public GameDTO getGameById(Long id) {
         Game game = gameRepository.findById(String.valueOf(id))
-                .orElseThrow(() -> new RuntimeException("Game not found"));
+                .orElse(null);
+        if (game == null) {
+            throw new RuntimeException("Game not found");
+        }
         return modelMapper.map(game, GameDTO.class);
     }
 
     public List<GameDTO> getGamesUploadedByUser(String email) {
-        return gameRepository.findByUploadedByEmail(email)
-                .stream()
+        Optional<Object> games = gameRepository.findByUploadedByEmail(email);
+        if (games == null) {
+            return List.of(); // Return an empty list if the result is null
+        }
+        return games.stream()
                 .map(game -> modelMapper.map(game, GameDTO.class))
                 .toList();
     }

@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/tooltip.tsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faCircleUser} from "@fortawesome/free-solid-svg-icons";
+import { getTotalPoints } from "@/api/reward.tsx";
 
 interface SidebarProps {
   activeItem?: string;
@@ -61,6 +62,24 @@ const Sidebar = ({ activeItem = "home", onMenuClick }: SidebarProps) => {
     onMenuClick?.(item.id);
   };
 
+  const [existingPoints, setExistingPoints] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    const fetchPoints = async () => {
+      const points = await getTotalPoints();
+      setExistingPoints(points);
+      localStorage.setItem('existingPoints', points.toString());
+    };
+    fetchPoints();
+  }, []);
+
+  React.useEffect(() => {
+    const storedPoints = localStorage.getItem('existingPoints');
+    if (storedPoints) {
+      setExistingPoints(parseInt(storedPoints, 10));
+    }
+  }, []);
+
   return (
     <div className="w-[280px] h-full bg-[#1E1B26] p-6 flex flex-col gap-6">
       <div className="space-y-4">
@@ -71,14 +90,14 @@ const Sidebar = ({ activeItem = "home", onMenuClick }: SidebarProps) => {
         <h1 className="tracking-tight lg:text-5xl text-[#8d8d8d] font-normal leading-4 text-[1xl]">
           A players space for fun
         </h1>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <Input
-            type="search"
-            placeholder="Search..."
-            className="w-full bg-white/5 border-white/10 text-white pl-10 placeholder:text-gray-400"
-          />
-        </div>
+        {/*<div className="relative">*/}
+        {/*  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />*/}
+        {/*  <Input*/}
+        {/*    type="search"*/}
+        {/*    placeholder="Search..."*/}
+        {/*    className="w-full bg-white/5 border-white/10 text-white pl-10 placeholder:text-gray-400"*/}
+        {/*  />*/}
+        {/*</div>*/}
       </div>
       <nav className="flex-1">
         <ul className="space-y-4">
@@ -107,6 +126,10 @@ const Sidebar = ({ activeItem = "home", onMenuClick }: SidebarProps) => {
         </ul>
       </nav>
       <div className="mt-auto">
+        <div className="p-4 bg-yellow-500 rounded-lg">
+          <p className="text-sm text-black/70 text-center font-bold">Points :{existingPoints}</p>
+        </div>
+        <br/>
         <div className="p-4 bg-white/5 rounded-lg">
           <p className="text-sm text-white/70 text-center">Z-Play v1.0</p>
         </div>

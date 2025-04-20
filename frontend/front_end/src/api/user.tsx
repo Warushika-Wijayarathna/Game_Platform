@@ -133,3 +133,53 @@ export async function updateInfoUser(user: { password: string | undefined, exist
         throw error;
     }
 }
+
+export const allUserCount = async (): Promise<number> => {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('No authentication token found');
+        }
+
+        const response = await axios.get<{ count: number }>(`${USER_API_URL}/count`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        return response.data.count;
+    } catch (error) {
+        console.error('Error fetching user count:', error);
+        if (axios.isAxiosError(error)) {
+            if (error.response?.status === 401) {
+                throw new Error('Session expired. Please login again.');
+            }
+        }
+        throw error;
+    }
+}
+
+export const developerCount = async (): Promise<number> => {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('No authentication token found');
+        }
+
+        const response = await axios.get<{ count: number }>(`${USER_API_URL}/developer/count`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        return response.data.count;
+    } catch (error) {
+        console.error('Error fetching developer count:', error);
+        if (axios.isAxiosError(error)) {
+            if (error.response?.status === 401) {
+                throw new Error('Session expired. Please login again.');
+            }
+        }
+        throw error;
+    }
+}

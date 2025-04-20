@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
+import {getUser, Users} from "@/api/user.tsx";
 
 interface ChatMessage {
     sender: string;
@@ -70,32 +71,41 @@ const Chat: React.FC = () => {
         setInputMessage('');
     };
 
-    if (!username) {
-        username = "user";
-    }
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const user: Users = await getUser();
+                if (!username) {
+                    setUsername(user.name);
+                }
+            } catch (error) {
+                console.error("Error fetching user:", error);
+            }
+        };
+
+        fetchUser();
+    }, [username]);
 
     return (
         <div style={{ maxWidth: '500px', margin: '0 auto', padding: '1rem', fontFamily: 'Arial, sans-serif', border: '1px solid #ccc', borderRadius: '8px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h2 style={{ margin: 0 }}>Chat Room</h2>
-                <div style={{ display: 'flex', alignItems: 'center', fontSize: '0.9rem' }}>
-                    <span style={{
-                        width: '10px',
-                        height: '10px',
-                        borderRadius: '50%',
-                        backgroundColor: isConnected ? 'green' : 'red',
-                        display: 'inline-block',
-                        marginRight: '5px'
-                    }} />
-                    {isConnected ? 'Connected' : 'Connecting...'}
-                </div>
+            <div style={{ display: 'flex', alignItems: 'center', fontSize: '0.9rem', color: '#aaa' }}>
+                <span style={{
+                    width: '10px',
+                    height: '10px',
+                    borderRadius: '50%',
+                    backgroundColor: isConnected ? 'green' : 'red',
+                    display: 'inline-block',
+                    marginRight: '5px'
+                }} />
+                {isConnected ? 'Connected' : 'Connecting...'}
             </div>
 
             <div style={{ height: '300px', overflowY: 'auto', border: '1px solid #ddd', borderRadius: '4px', padding: '0.5rem', marginBottom: '1rem' }}>
                 {messages.map((msg, index) => (
                     <div key={index} style={{
                         marginBottom: '0.75rem',
-                        textAlign: msg.sender === username ? 'right' : 'left'
+                        textAlign: msg.sender === username ? 'right' : 'left',
+                        color: '#888'
                     }}>
                         <div style={{ fontSize: '0.85rem', fontWeight: 'bold' }}>
                             {msg.sender} <span style={{ fontWeight: 'normal', color: '#666', fontSize: '0.75rem' }}>

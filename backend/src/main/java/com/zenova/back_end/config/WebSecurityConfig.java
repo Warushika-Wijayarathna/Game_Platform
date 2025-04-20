@@ -61,6 +61,10 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/api/v1/user/topScorers",
+                                "/api/v1/reward/totalPoints",
+                                "/api/v1/user/developer/count",
+                                "/api/v1/user/count",
                                 "/ws/**",
                                 "/api/v1/game/user/uploaded",
                                 "/api/v1/reward/claim/",

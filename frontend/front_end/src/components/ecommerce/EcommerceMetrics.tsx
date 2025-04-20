@@ -1,10 +1,12 @@
 import {
-  ArrowDownIcon,
-  ArrowUpIcon,
   BoxIconLine,
   GroupIcon,
 } from "../../icons";
-import Badge from "../ui/badge/Badge";
+import {allUserCount, developerCount} from "../../api/user.tsx";
+
+const allUsers : number = await allUserCount();
+
+const developCount : number = await developerCount();
 
 export default function EcommerceMetrics() {
   return (
@@ -21,7 +23,7 @@ export default function EcommerceMetrics() {
               Players
             </span>
             <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
-              4
+              {allUsers}
             </h4>
           </div>
 
@@ -40,7 +42,7 @@ export default function EcommerceMetrics() {
               Developers
             </span>
             <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
-              13
+              {developCount}
             </h4>
           </div>
         </div>

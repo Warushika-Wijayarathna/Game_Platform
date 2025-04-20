@@ -15,4 +15,6 @@ public interface ScoreService {
     List<RewardDTO> getWeeklyReward(UserDTO user);
 
     void claimReward(UserDTO user, int dayOfWeek);
+
+    int getTotalPointsByEmail(String email);
 }

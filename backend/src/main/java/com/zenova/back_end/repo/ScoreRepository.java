@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,4 +23,12 @@ public interface ScoreRepository extends JpaRepository<Score, UUID> {
 
     @Query("SELECT s FROM Score s WHERE s.user.uid = :uuid")
     List<Score> findAllByUid(@Param("uuid") UUID uuid);
+
+    @Query(nativeQuery = true, value = "SELECT u.name, SUM(s.score) AS total_score " +
+            "FROM scores s " +
+            "JOIN user u ON s.user_uid = u.uid " +
+            "GROUP BY u.name " +
+            "ORDER BY total_score DESC " +
+            "LIMIT 3")
+    List<Map<String, Object>> findTopScorers();
 }

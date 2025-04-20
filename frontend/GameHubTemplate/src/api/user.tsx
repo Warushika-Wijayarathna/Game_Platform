@@ -133,3 +133,19 @@ export async function updateInfoUsers(user: { password: string | undefined, user
         throw error;
     }
 }
+
+export async function getTopScorers (): Promise<any[]> {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`${USER_API_URL}/topScorers`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+        console.log('Top scorers:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching top scorers:', error);
+        throw error;
+    }
+}

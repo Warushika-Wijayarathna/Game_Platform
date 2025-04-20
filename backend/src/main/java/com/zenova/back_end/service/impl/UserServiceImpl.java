@@ -2,6 +2,7 @@ package com.zenova.back_end.service.impl;
 
 import com.zenova.back_end.dto.UserDTO;
 import com.zenova.back_end.entity.User;
+import com.zenova.back_end.repo.ScoreRepository;
 import com.zenova.back_end.repo.UserRepository;
 import com.zenova.back_end.service.UserService;
 import com.zenova.back_end.util.Role;
@@ -16,10 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -32,6 +30,9 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private ScoreRepository scoreRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -158,6 +159,22 @@ public class UserServiceImpl implements UserDetailsService, UserService {
             user.setPassword(passwordEncoder.encode(newPassword));
             userRepository.save(user);
         }
+    }
+
+    @Override
+    public int getUserCount() {
+        return (int) userRepository.count();
+    }
+
+    @Override
+    public int getDeveloperCount() {
+        Long count = (Long) userRepository.countByRole(Role.DEVELOPER);
+        return count != null ? count.intValue() : 0;
+    }
+
+    @Override
+    public List<Map<String, Object>> getTopScorers() {
+        return scoreRepository.findTopScorers();
     }
 
     @Override

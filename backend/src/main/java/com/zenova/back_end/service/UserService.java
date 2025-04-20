@@ -5,6 +5,7 @@ import com.zenova.back_end.dto.UserDTO;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public interface UserService {
@@ -28,4 +29,10 @@ public interface UserService {
     boolean validatePassword(String email, String existingPassword);
 
     void updatePassword(String email, String newPassword);
+
+    int getUserCount();
+
+    int getDeveloperCount();
+
+    List<Map<String, Object>> getTopScorers();
 }
