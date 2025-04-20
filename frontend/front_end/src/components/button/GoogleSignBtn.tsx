@@ -33,8 +33,6 @@ export function GoogleSignBtn() {
 
 
                     // Optionally, you can also store user info in local storage
-                    localStorage.setItem("token", JSON.stringify(res.data.data.token));
-
                     await sendTokenToOtherDomains(localStorage.getItem("token") || "");
 
                     // Redirect to another page after successful login

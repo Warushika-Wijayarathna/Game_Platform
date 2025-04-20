@@ -77,22 +77,22 @@ const LoginForm: React.FC = () => {
                     </div>
 
                     {/* Remember Me & Forgot Password */}
-                    <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center">
-                            <input
-                                id="remember-me"
-                                name="remember-me"
-                                type="checkbox"
-                                className="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                            />
-                            <label htmlFor="remember-me" className="text-gray-800 ml-3 text-sm">
-                                Remember me
-                            </label>
-                        </div>
-                        <Link to="/forgot-password" className="text-blue-600 text-sm font-semibold hover:underline">
-                            Forgot Password?
-                        </Link>
-                    </div>
+                    {/*<div className="flex items-center justify-between mb-6">*/}
+                    {/*    <div className="flex items-center">*/}
+                    {/*        <input*/}
+                    {/*            id="remember-me"*/}
+                    {/*            name="remember-me"*/}
+                    {/*            type="checkbox"*/}
+                    {/*            className="h-4 w-4 text-blue-600 border-gray-300 rounded"*/}
+                    {/*        />*/}
+                    {/*        <label htmlFor="remember-me" className="text-gray-800 ml-3 text-sm">*/}
+                    {/*            Remember me*/}
+                    {/*        </label>*/}
+                    {/*    </div>*/}
+                    {/*    <Link to="/forgot-password" className="text-blue-600 text-sm font-semibold hover:underline">*/}
+                    {/*        Forgot Password?*/}
+                    {/*    </Link>*/}
+                    {/*</div>*/}
 
                     {/* Submit Button */}
                     <button

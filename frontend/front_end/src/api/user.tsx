@@ -137,6 +137,7 @@ export async function updateInfoUser(user: { password: string | undefined, exist
 export const allUserCount = async (): Promise<number> => {
     try {
         const token = localStorage.getItem('token');
+        console.log("Token:", token);
         if (!token) {
             throw new Error('No authentication token found');
         }
@@ -162,6 +163,7 @@ export const allUserCount = async (): Promise<number> => {
 export const developerCount = async (): Promise<number> => {
     try {
         const token = localStorage.getItem('token');
+        console.log("Token:", token);
         if (!token) {
             throw new Error('No authentication token found');
         }
