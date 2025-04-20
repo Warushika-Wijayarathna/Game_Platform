@@ -1,7 +1,6 @@
 package com.zenova.back_end.service.impl;
 
 import com.zenova.back_end.dto.GameDTO;
-import com.zenova.back_end.dto.PurchaseDTO;
 import com.zenova.back_end.dto.UserDTO;
 import com.zenova.back_end.entity.Category;
 import com.zenova.back_end.entity.Game;
@@ -13,13 +12,11 @@ import com.zenova.back_end.service.GameService;
 
 import com.zenova.back_end.util.JwtUtil;
 import com.zenova.back_end.util.Role;
-import io.jsonwebtoken.Claims;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
