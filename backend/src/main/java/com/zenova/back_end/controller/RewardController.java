@@ -10,10 +10,7 @@ import com.zenova.back_end.util.VarList;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -51,5 +48,29 @@ public class RewardController {
         }
 
         return ResponseEntity.ok(new ResponseDTO(VarList.OK, "Weekly rewards are fetched", weekly_rewards));
+    }
+
+    @PostMapping(value = "/claim/{dayOfWeek}")
+    public ResponseEntity<ResponseDTO> claimReward(
+            @RequestHeader("Authorization") String token,
+            @PathVariable int dayOfWeek) {
+        try {
+            // Extract the token and get user details
+            String tokens = token.replace("Bearer ", "");
+            Claims claims = jwtUtil.getAllClaimsFromToken(tokens);
+            String email = claims.getSubject();
+
+            // Fetch the user by email
+            UserDTO user = userService.getUserByEmail(email);
+
+            // Call the service method to claim the reward
+            scoreService.claimReward(user, dayOfWeek);
+
+            // Return success response
+            return ResponseEntity.ok(new ResponseDTO(VarList.OK, "Reward claimed successfully", null));
+        } catch (RuntimeException e) {
+            // Handle errors and return appropriate response
+            return ResponseEntity.status(400).body(new ResponseDTO(VarList.Internal_Server_Error, e.getMessage(), null));
+        }
     }
 }

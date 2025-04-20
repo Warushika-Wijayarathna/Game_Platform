@@ -8,8 +8,6 @@ import { TooltipProvider } from "@/components/ui/tooltip.tsx";
 import PlayGame from "./components/playGame.tsx";
 import WatchStream from "@/components/WatchStream.tsx";
 import Profile from "./components/profile.tsx";
-import Sidebar from "@/components/layout/Sidebar.tsx";
-import ChatUi from "@/components/chat/chatUi.tsx";
 import Chat from "@/components/chat/Chat.tsx";
 
 function App() {
@@ -31,6 +29,10 @@ function App() {
     return () => window.removeEventListener("message", handleMessage);
   }, []);
 
+  if (typeof global === "undefined") {
+    (window as any).global = window;
+  }
+
   return (
       <TooltipProvider>
         <Suspense fallback={<p>Loading...</p>}>
@@ -42,7 +44,7 @@ function App() {
               <Route path="/profile" element={<Profile/>}/>
               <Route path="/playGame/:gameId" element={<PlayGame />} />
               <Route path="/watch/:gameId" element={<WatchStream/>}/>
-              {/*<Route path="/chat" element={<Chat/>}/>*/}
+              <Route path="/chat" element={<Chat/>}/>
 
             </Routes>
             {import.meta.env.VITE_TEMPO === "true" && useRoutes(routes)}

@@ -9,6 +9,10 @@ TempoDevtools.init();
 
 const basename = import.meta.env.BASE_URL;
 
+if (typeof global === "undefined") {
+    (window as any).global = window;
+}
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter basename={basename}>

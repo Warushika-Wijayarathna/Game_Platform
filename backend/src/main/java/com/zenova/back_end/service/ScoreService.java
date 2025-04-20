@@ -13,4 +13,6 @@ public interface ScoreService {
     List<LeaderBoardDTO> getTopLeaderBoard(String gameId);
 
     List<RewardDTO> getWeeklyReward(UserDTO user);
+
+    void claimReward(UserDTO user, int dayOfWeek);
 }

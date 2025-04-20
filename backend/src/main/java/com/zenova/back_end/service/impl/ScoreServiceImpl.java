@@ -79,7 +79,7 @@ public class ScoreServiceImpl implements ScoreService {
         LocalDate today = LocalDate.now();
         LocalDate weekStart = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
 
-        List<RewardEntry> rewards = rewardEntryRepository.findByUserIdAndWeekStartDate(String.valueOf((user.getUid())), weekStart);
+        List<RewardEntry> rewards = rewardEntryRepository.findByUserIdAndWeekStartDate(user.getUid(), weekStart);
 
         if (rewards.isEmpty()) {
             rewards = generateWeeklyRewards(String.valueOf(user.getUid()), weekStart, totalScore);
@@ -135,9 +135,7 @@ public class ScoreServiceImpl implements ScoreService {
         LocalDate today = LocalDate.now();
         LocalDate weekStart = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
 
-        RewardEntry entry = rewardEntryRepository.findByUserIdAndWeekStartDateAndDayOfWeek(
-                String.valueOf(user.getUid()), weekStart, dayOfWeek
-        );
+        RewardEntry entry = rewardEntryRepository.findByUserIdAndWeekStartDateAndDayOfWeek(user.getUid(), weekStart, dayOfWeek);
 
         if (entry == null) {
             throw new RuntimeException("Reward not found.");
@@ -156,5 +154,6 @@ public class ScoreServiceImpl implements ScoreService {
         rewardEntryRepository.save(entry);
 
     }
+
 
 }

@@ -8,7 +8,7 @@ import { faPlay } from "@fortawesome/free-solid-svg-icons";
 import {fetchAllGames, Games, User} from "../api/games";
 import ErrorBoundary from "../components/ErrorBoundary";
 import DailyRewards from "@/components/rewards/DailyRewards.tsx";
-import ChatUi from "@/components/chat/chatUi.tsx";
+import Chat from "@/components/chat/Chat.tsx";
 
 export default function Store() {
     const navigate = useNavigate();
@@ -155,7 +155,7 @@ export default function Store() {
                 </button>
 
                 {isChatOpen && (
-                    <ChatUi
+                    <Chat
                         donorId={activeDonorId}
                         onClose={handleChatClose}
                     />

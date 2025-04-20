@@ -1,4 +1,3 @@
-// vite.config.ts
 import path from "path";
 import { defineConfig } from "file:///home/user/IdeaProjects/GameHubTemplate/node_modules/vite/dist/node/index.js";
 import react from "file:///home/user/IdeaProjects/GameHubTemplate/node_modules/@vitejs/plugin-react-swc/index.mjs";
